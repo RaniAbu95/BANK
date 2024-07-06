@@ -1,4 +1,4 @@
-package exceptions;
+package myBankApplication.exceptions;
 
 public class CustomerNotFoundException extends Exception{
 }

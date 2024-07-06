@@ -1,11 +1,15 @@
-package BL;
+package myBankApplication.BL;
 
-import beans.Customer;
-import dao.CustomerDoa;
-import exceptions.*;
+import myBankApplication.beans.Customer;
+import myBankApplication.dao.CustomerDoa;
+
+import myBankApplication.exceptions.*;
+import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
+
+@Service
 public class CustomerBL {
 
 

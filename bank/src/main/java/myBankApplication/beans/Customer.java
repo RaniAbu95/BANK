@@ -1,4 +1,4 @@
-package beans;
+package myBankApplication.beans;
 
 import jakarta.persistence.*;
 
@@ -22,7 +22,7 @@ public class Customer {
     private String Location;
 
 
-    @OneToMany(mappedBy = "Accounts", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "customer", fetch = FetchType.LAZY)
     private List<Account> accounts;
 
     public Customer(){};

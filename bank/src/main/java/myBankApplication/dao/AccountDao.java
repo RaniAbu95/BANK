@@ -1,6 +1,6 @@
-package dao;
+package myBankApplication.dao;
 
-import beans.Account;
+import myBankApplication.beans.Account;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface AccountDao extends JpaRepository<Account,Integer> {

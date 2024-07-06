@@ -1,6 +1,6 @@
-package dao;
+package myBankApplication.dao;
 
-import beans.Customer;
+import myBankApplication.beans.Customer;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface CustomerDoa extends JpaRepository<Customer, Integer> {

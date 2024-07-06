@@ -1,4 +1,4 @@
-package beans;
+package myBankApplication.beans;
 
 import jakarta.persistence.*;
 
@@ -17,9 +17,10 @@ public class Account {
     @Column(name="password")
     private String Password;
 
-    @ManyToOne
-    @JoinColumn(name = "Customer_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "customer_id")
     private Customer customer;
+
 
     public Account(){};
     public Account(String balance, int accountId, String category, String password) {
