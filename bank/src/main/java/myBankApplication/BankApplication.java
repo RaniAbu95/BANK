@@ -1,10 +1,7 @@
 
 package myBankApplication;
 
-import myBankApplication.exceptions.AccountBalanceErrorException;
-import myBankApplication.exceptions.AccountCategoryErrorException;
-import myBankApplication.exceptions.AccountPasswordErrorException;
-import myBankApplication.exceptions.AccountsIsNotExistException;
+import myBankApplication.exceptions.*;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
@@ -12,7 +9,7 @@ import org.springframework.context.ApplicationContext;
 @SpringBootApplication
 public class BankApplication {
 
-	public static void main(String[] args) throws AccountsIsNotExistException, AccountBalanceErrorException, AccountPasswordErrorException, AccountCategoryErrorException {
+	public static void main(String[] args) throws AccountsAlreadyExistException, AccountBalanceErrorException, AccountPasswordErrorException, AccountCategoryErrorException, CustomerEmailErrorException, CustomerLocationErrorException, EmailErrorException, CustomerIdErrorException, CustomerIsNotExistException {
 
 		ApplicationContext context = SpringApplication.run(BankApplication.class, args);
 		System.out.println("Hello world");

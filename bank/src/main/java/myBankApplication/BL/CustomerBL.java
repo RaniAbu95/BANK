@@ -4,6 +4,7 @@ import myBankApplication.beans.Customer;
 import myBankApplication.dao.CustomerDoa;
 
 import myBankApplication.exceptions.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -12,10 +13,12 @@ import java.util.Optional;
 @Service
 public class CustomerBL {
 
-
+    @Autowired
     private CustomerDoa customerDoa;
     public Customer createCustomer(Customer customer) throws CustomerIsNotExistException, EmailErrorException, CustomerEmailErrorException, CustomerIdErrorException, CustomerLocationErrorException {
         //have to take the parameters from customer opject to create new account
+
+
         Optional<Customer> existingCustomer= Optional.ofNullable(this.customerDoa.findById(customer.getId()));
         //Create intercase Dao
         //create findById function

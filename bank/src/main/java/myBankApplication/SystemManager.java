@@ -16,10 +16,8 @@ import myBankApplication.BL.AccountBL;
 import myBankApplication.BL.CustomerBL;
 import myBankApplication.beans.Account;
 
-import myBankApplication.exceptions.AccountBalanceErrorException;
-import myBankApplication.exceptions.AccountCategoryErrorException;
-import myBankApplication.exceptions.AccountPasswordErrorException;
-import myBankApplication.exceptions.AccountsIsNotExistException;
+import myBankApplication.beans.Customer;
+import myBankApplication.exceptions.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -34,12 +32,16 @@ public class SystemManager {
     private CustomerBL customerBL;
 
 
-    public void run() throws AccountsIsNotExistException, AccountBalanceErrorException, AccountPasswordErrorException, AccountCategoryErrorException {
+    public void run() throws AccountsAlreadyExistException, AccountBalanceErrorException, AccountPasswordErrorException, AccountCategoryErrorException, CustomerEmailErrorException, CustomerLocationErrorException, EmailErrorException, CustomerIdErrorException, CustomerIsNotExistException {
 
         System.out.println("Adding account to database");
-        Account account = new Account("1000", 1, "Savings", "password123");
+//        Account account = new Account("1000", 1, "Savings", "password123");
+//
+//        accountBL.createAccount(account);
 
-        accountBL.createAccount(account);
+        Customer customer = new Customer("New York", "john_doe", 12345, "john.doe@example.com");
 
+        customerBL.createCustomer(customer);
     }
+
 }

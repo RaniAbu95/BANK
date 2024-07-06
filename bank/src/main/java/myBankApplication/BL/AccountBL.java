@@ -1,6 +1,5 @@
 package myBankApplication.BL;
 
-import myBankApplication.BL.CustomerBL;
 import myBankApplication.beans.Account;
 import myBankApplication.dao.AccountDao;
 import myBankApplication.exceptions.*;
@@ -21,12 +20,12 @@ public class AccountBL {
     private CustomerBL customerLB;
 
 
-    public Account createAccount(Account accounts) throws AccountsIsNotExistException, AccountBalanceErrorException, AccountCategoryErrorException, AccountPasswordErrorException {
+    public Account createAccount(Account accounts) throws AccountsAlreadyExistException, AccountBalanceErrorException, AccountCategoryErrorException, AccountPasswordErrorException {
 
 
         Optional<Account> existingAccount = Optional.ofNullable(this.accountDao.findById(accounts.getAccountId()));
         if (existingAccount.isPresent()) {
-            throw new AccountsIsNotExistException();
+            throw new AccountsAlreadyExistException();
         }
 
         if(accounts.getBalance()==null){
@@ -43,7 +42,7 @@ public class AccountBL {
     }
 
 
-    public Account createNewAccount(Account accounts , int id) throws CustomerNotFoundException, AccountsIsNotExistException, AccountBalanceErrorException, AccountPasswordErrorException, AccountCategoryErrorException {
+    public Account createNewAccount(Account accounts , int id) throws CustomerNotFoundException, AccountsAlreadyExistException, AccountBalanceErrorException, AccountPasswordErrorException, AccountCategoryErrorException {
 
         if(customerLB.getCustomer(id) ==null){
             throw new CustomerNotFoundException();
