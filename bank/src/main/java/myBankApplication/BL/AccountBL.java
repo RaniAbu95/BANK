@@ -1,6 +1,7 @@
 package myBankApplication.BL;
 
 import myBankApplication.beans.Account;
+import myBankApplication.beans.Customer;
 import myBankApplication.dao.AccountDao;
 import myBankApplication.exceptions.*;
 
@@ -52,4 +53,7 @@ public class AccountBL {
         accounts = createAccount( accounts);
         return  accounts;
     }
+
+
+
 }

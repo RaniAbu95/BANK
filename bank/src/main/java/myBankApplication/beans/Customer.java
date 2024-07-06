@@ -25,6 +25,10 @@ public class Customer {
     @OneToMany(mappedBy = "customer", fetch = FetchType.LAZY)
     private List<Account> accounts;
 
+
+    @OneToMany(mappedBy = "account", fetch = FetchType.LAZY)
+    private List<Loan> loan;
+
     public Customer(){};
     public Customer(String location, String username, int customerId, String email) {
         Location = location;

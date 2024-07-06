@@ -2,6 +2,8 @@ package myBankApplication.beans;
 
 import jakarta.persistence.*;
 
+import java.util.List;
+
 @Entity
 @Table(name="accounts")
 public class Account {
@@ -20,6 +22,9 @@ public class Account {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "customer_id")
     private Customer customer;
+
+    @OneToMany(mappedBy = "account", fetch = FetchType.LAZY)
+    private List<Loan> loan;
 
 
     public Account(){};
@@ -60,5 +65,8 @@ public class Account {
 
     public void setPassword(String password) {
         Password = password;
+    }
+
+    public int getAmount() {
     }
 }

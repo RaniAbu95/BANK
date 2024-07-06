@@ -37,7 +37,6 @@ public class CustomerBL {
             throw new CustomerIdErrorException();
         }
 
-
         return this.customerDoa.save(customer);
     }
     public Customer getCustomer(int id) throws CustomerNotFoundException {

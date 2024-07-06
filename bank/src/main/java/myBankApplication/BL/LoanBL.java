@@ -1,7 +1,9 @@
 package myBankApplication.BL;
 
 import myBankApplication.beans.Account;
+import myBankApplication.beans.Customer;
 import myBankApplication.beans.Loan;
+import myBankApplication.dao.AccountDao;
 import myBankApplication.dao.CustomerDoa;
 import myBankApplication.dao.LoanDAO;
 import myBankApplication.exceptions.*;
@@ -16,26 +18,36 @@ public class LoanBL {
     @Autowired
     private LoanDAO loanDAO;
 
+    @Autowired
+    private AccountDao accountDAO;
 
-    public Loan createLoan(Loan loan) throws AccountsAlreadyExistException, AccountBalanceErrorException, AccountCategoryErrorException, AccountPasswordErrorException, LoanAlreadyExist {
 
-        // account can't have two loans
-        Optional<Loan> exsitingLoan = Optional.ofNullable(this.loanDAO.findByAccount_AccountId(loan.getAccount().getAccountId()));
+    public Loan createLoan(Account account) throws AccountsAlreadyExistException, AccountBalanceErrorException, AccountCategoryErrorException, AccountPasswordErrorException, LoanAlreadyExist {
+
+
+        Optional<Customer> exsitingLoan = Optional.ofNullable(this.loanDAO.findById(account.getAccountId()));
         if (exsitingLoan.isPresent()) {
             throw new LoanAlreadyExist();
         }
 
-        if(loan.getLoanType()==null){
+        if(account.getAccountId()==0){
             throw new AccountBalanceErrorException();
         }
-        if(loan.getAmount() ==0){
+        if(account.getAmount() ==0){
             throw new AccountCategoryErrorException();
         }
-        if(loan.getIntersetRate() == 0){
+        if(account.getCategory() !=null){
             throw new AccountPasswordErrorException();
         }
 
         return this.loanDAO.save(loan);
     }
 
+    public Account getAccount(int id) throws CustomerNotFoundException {
+        Optional<Account>account = Optional.ofNullable(this.accountDAO.findById(id));
+        if(account.isPresent()){
+            return account.get();
+        }
+        throw new CustomerNotFoundException();
+    }
 }
