@@ -1,2 +1,4 @@
-package myBankApplication.exceptions;public class LimitErrorException {
+package myBankApplication.exceptions;
+
+public class LimitErrorException extends Exception{
 }

@@ -15,7 +15,7 @@ public class CustomerBL {
 
     @Autowired
     private CustomerDoa customerDoa;
-    public Customer createCustomer(Customer customer) throws CustomerIsNotExistException, EmailErrorException, CustomerEmailErrorException, CustomerIdErrorException, CustomerLocationErrorException {
+    public Customer checkCustomer(Customer customer) throws CustomerIsNotExistException, EmailErrorException, CustomerEmailErrorException, CustomerIdErrorException, CustomerLocationErrorException {
         //have to take the parameters from customer opject to create new account
 
 

@@ -1,2 +1,4 @@
-package myBankApplication.exceptions;public class CompanyErrorException {
+package myBankApplication.exceptions;
+
+public class CompanyErrorException extends Exception{
 }

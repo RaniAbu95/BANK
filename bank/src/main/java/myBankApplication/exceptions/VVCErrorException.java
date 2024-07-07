@@ -1,2 +1,4 @@
-package myBankApplication.exceptions;public class VVCErrorException {
+package myBankApplication.exceptions;
+
+public class VVCErrorException extends Exception{
 }

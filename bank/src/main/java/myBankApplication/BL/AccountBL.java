@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 
+import javax.security.auth.login.AccountNotFoundException;
 import java.util.Optional;
 
 @Service
@@ -21,7 +22,7 @@ public class AccountBL {
     private CustomerBL customerLB;
 
 
-    public Account createAccount(Account accounts) throws AccountsAlreadyExistException, AccountBalanceErrorException, AccountCategoryErrorException, AccountPasswordErrorException {
+    public Account checkAccount(Account accounts) throws AccountsAlreadyExistException, AccountBalanceErrorException, AccountCategoryErrorException, AccountPasswordErrorException {
 
 
         Optional<Account> existingAccount = Optional.ofNullable(this.accountDao.findById(accounts.getAccountId()));
@@ -50,10 +51,16 @@ public class AccountBL {
         }
 
 
-        accounts = createAccount( accounts);
+        accounts = checkAccount( accounts);
         return  accounts;
     }
 
-
+    public Account getAccount(int id) throws AccountNotFoundException {
+        Optional<Account>account = Optional.ofNullable(this.accountDao.findById(id));
+        if(account.isPresent()){
+            return account.get();
+        }
+        throw new AccountNotFoundException();
+    }
 
 }

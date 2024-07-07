@@ -1,0 +1,62 @@
+package myBankApplication.BL;
+
+import myBankApplication.beans.Account;
+import myBankApplication.beans.Transaction;
+import myBankApplication.dao.AccountDao;
+import myBankApplication.dao.TransactionDao;
+import myBankApplication.exceptions.*;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import javax.security.auth.login.AccountNotFoundException;
+import java.util.Optional;
+
+public class TransactionBL {
+
+
+    @Autowired
+    private TransactionDao transactionDao;
+
+    @Autowired
+    private TransactionBL transactionBL;
+
+    @Autowired
+    private AccountBL accountBL;
+
+
+    public Transaction checkTransaction(Transaction transaction) throws TransactionAlreadyExistException {
+
+
+        Optional<Transaction> existingTransaction = Optional.ofNullable(this.transactionDao.findById(transaction.getTransactionId()));
+        if (existingTransaction.isPresent()) {
+            throw new TransactionAlreadyExistException();
+        }
+
+        //timeStamp
+        //operation
+        //target
+
+
+
+        return this.transactionDao.save(transaction);
+    }
+
+
+    public Transaction createNewTransaction(Transaction transaction , int id) throws AccountNotFoundException, TransactionAlreadyExistException {
+
+        if(accountBL.getAccount(id) ==null){
+            throw new AccountNotFoundException();
+        }
+
+
+        transaction = checkTransaction( transaction);
+        return  transaction;
+    }
+
+    public Transaction getTransaction(int id) throws TransactionNotFoundException {
+        Optional<Transaction> transaction = Optional.ofNullable(this.transactionDao.findById(id));
+        if(transaction.isPresent()){
+            return transaction.get();
+        }
+        throw new TransactionNotFoundException();
+    }
+}

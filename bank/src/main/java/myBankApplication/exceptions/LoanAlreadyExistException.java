@@ -1,2 +1,4 @@
-package myBankApplication.exceptions;public class LoanAlreadyExistException {
+package myBankApplication.exceptions;
+
+public class LoanAlreadyExistException extends Exception{
 }

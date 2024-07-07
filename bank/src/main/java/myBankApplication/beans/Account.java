@@ -13,7 +13,6 @@ public class Account {
 
     @Column(name="balance")
     private String balance;
-
     @Column(name="category")
     private String category;
     @Column(name="password")
@@ -23,8 +22,13 @@ public class Account {
     @JoinColumn(name = "customer_id")
     private Customer customer;
 
+
     @OneToMany(mappedBy = "account", fetch = FetchType.LAZY)
     private List<Loan> loan;
+
+
+    @OneToMany(mappedBy = "account", fetch = FetchType.LAZY)
+    private List<VisaCard> visaCards;
 
 
     public Account(){};
@@ -67,6 +71,5 @@ public class Account {
         Password = password;
     }
 
-    public int getAmount() {
-    }
+
 }

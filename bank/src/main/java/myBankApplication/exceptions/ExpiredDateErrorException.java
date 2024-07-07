@@ -1,2 +1,4 @@
-package myBankApplication.exceptions;public class ExpiredDateErrorException {
+package myBankApplication.exceptions;
+
+public class ExpiredDateErrorException extends Exception{
 }

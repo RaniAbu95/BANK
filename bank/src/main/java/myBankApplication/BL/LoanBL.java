@@ -3,13 +3,12 @@ package myBankApplication.BL;
 import myBankApplication.beans.Account;
 import myBankApplication.beans.Customer;
 import myBankApplication.beans.Loan;
-import myBankApplication.dao.AccountDao;
-import myBankApplication.dao.CustomerDoa;
 import myBankApplication.dao.LoanDAO;
 import myBankApplication.exceptions.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.security.auth.login.AccountNotFoundException;
 import java.util.Optional;
 
 @Service
@@ -17,37 +16,37 @@ public class LoanBL {
 
     @Autowired
     private LoanDAO loanDAO;
-
-    @Autowired
-    private AccountDao accountDAO;
+    private AccountBL accountbl;
 
 
-    public Loan createLoan(Account account) throws AccountsAlreadyExistException, AccountBalanceErrorException, AccountCategoryErrorException, AccountPasswordErrorException, LoanAlreadyExist {
 
 
-        Optional<Customer> exsitingLoan = Optional.ofNullable(this.loanDAO.findById(account.getAccountId()));
-        if (exsitingLoan.isPresent()) {
-            throw new LoanAlreadyExist();
+    public Loan checkLoan(Loan loan) throws LoanAlreadyExistException, LoanAmountErrorException, LoanTypeErrorException {
+
+
+        Optional<Loan> existingLoan = Optional.ofNullable(this.loanDAO.findById(loan.getLoanId()));
+        if (existingLoan.isPresent()) {
+            throw new LoanAlreadyExistException();
         }
 
-        if(account.getAccountId()==0){
-            throw new AccountBalanceErrorException();
+        if(loan.getAmount() ==0){
+            throw new LoanAmountErrorException();
         }
-        if(account.getAmount() ==0){
-            throw new AccountCategoryErrorException();
-        }
-        if(account.getCategory() !=null){
-            throw new AccountPasswordErrorException();
+        if(loan.getLoanType() !=null){
+            throw new LoanTypeErrorException();
         }
 
         return this.loanDAO.save(loan);
     }
 
-    public Account getAccount(int id) throws CustomerNotFoundException {
-        Optional<Account>account = Optional.ofNullable(this.accountDAO.findById(id));
-        if(account.isPresent()){
-            return account.get();
-        }
-        throw new CustomerNotFoundException();
+}
+
+public Loan createNewLoan(Loan loan , int id) throws CustomerNotFoundException, AccountsAlreadyExistException, AccountBalanceErrorException, AccountPasswordErrorException, AccountCategoryErrorException, AccountNotFoundException, LoanAlreadyExist, LoanAlreadyExistException {
+
+    if(accountbl.getAccount(id) ==null){
+        throw new AccountNotFoundException();
     }
+    loan = checkLoan( loan);
+    return  loan;
+}
 }

@@ -5,6 +5,6 @@ import myBankApplication.beans.Loan;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface LoanDAO  extends JpaRepository<Loan, Integer> {
-    Customer findById(int customerId);
+    Loan findById(int loanId);
 
 }

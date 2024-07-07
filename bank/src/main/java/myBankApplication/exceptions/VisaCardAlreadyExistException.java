@@ -1,2 +1,5 @@
-package myBankApplication.exceptions;public class VisaCardAlreadyExistException {
+package myBankApplication.exceptions;
+
+public class VisaCardAlreadyExistException extends Exception
+{
 }
