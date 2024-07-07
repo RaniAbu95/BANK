@@ -1,5 +1,6 @@
 package myBankApplication.BL;
 
+import myBankApplication.beans.Account;
 import myBankApplication.beans.Customer;
 import myBankApplication.dao.CustomerDoa;
 
@@ -45,5 +46,19 @@ public class CustomerBL {
             return customer.get();
         }
         throw new CustomerNotFoundException();
+    }
+
+
+    public Customer createNewCustomer(Customer customer) throws CustomerEmailErrorException, CustomerLocationErrorException, EmailErrorException, CustomerIdErrorException, CustomerIsNotExistException, CustomerNotFoundException {
+
+//        if(getCustomer(id).getCustomerId() ==null){
+//            throw new CustomerNotFoundException();
+//        }
+
+
+        Customer customerToAdd = checkCustomer( customer);
+
+
+        return  customerToAdd;
     }
 }

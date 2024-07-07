@@ -39,14 +39,16 @@ public class LoanBL {
         return this.loanDAO.save(loan);
     }
 
-}
-
-public Loan createNewLoan(Loan loan , int id) throws CustomerNotFoundException, AccountsAlreadyExistException, AccountBalanceErrorException, AccountPasswordErrorException, AccountCategoryErrorException, AccountNotFoundException, LoanAlreadyExist, LoanAlreadyExistException {
+    public Loan createNewLoan(Loan loan , int id) throws AccountNotFoundException, LoanAlreadyExistException, LoanTypeErrorException, LoanAmountErrorException {
 
     if(accountbl.getAccount(id) ==null){
         throw new AccountNotFoundException();
     }
-    loan = checkLoan( loan);
+    loan = checkLoan(loan);
     return  loan;
 }
+
 }
+
+
+

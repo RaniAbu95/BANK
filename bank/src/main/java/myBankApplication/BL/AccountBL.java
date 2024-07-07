@@ -25,7 +25,7 @@ public class AccountBL {
     public Account checkAccount(Account accounts) throws AccountsAlreadyExistException, AccountBalanceErrorException, AccountCategoryErrorException, AccountPasswordErrorException {
 
 
-        Optional<Account> existingAccount = Optional.ofNullable(this.accountDao.findById(accounts.getAccountId()));
+        Optional<Account> existingAccount = this.accountDao.findById(accounts.getAccountId());
         if (existingAccount.isPresent()) {
             throw new AccountsAlreadyExistException();
         }
@@ -56,7 +56,7 @@ public class AccountBL {
     }
 
     public Account getAccount(int id) throws AccountNotFoundException {
-        Optional<Account>account = Optional.ofNullable(this.accountDao.findById(id));
+        Optional<Account>account = this.accountDao.findById(id);
         if(account.isPresent()){
             return account.get();
         }

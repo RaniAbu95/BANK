@@ -39,7 +39,7 @@ public class VisaCardBL {
         if(visaCard.getVvc()==null){
             throw new VVCErrorException();
         }
-        if(visaCard.getLimit()==null){
+        if(visaCard.getCredit()==null){
             throw new LimitErrorException();
         }
         if(visaCard.getStatus()==null){

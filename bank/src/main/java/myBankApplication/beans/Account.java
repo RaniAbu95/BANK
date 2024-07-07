@@ -22,11 +22,11 @@ public class Account {
     @JoinColumn(name = "customer_id")
     private Customer customer;
 
-
-    @OneToMany(mappedBy = "account", fetch = FetchType.LAZY)
-    private List<Loan> loan;
-
-
+//
+//    @OneToMany(mappedBy = "account", fetch = FetchType.LAZY)
+//    private List<Loan> loan;
+//
+//
     @OneToMany(mappedBy = "account", fetch = FetchType.LAZY)
     private List<VisaCard> visaCards;
 

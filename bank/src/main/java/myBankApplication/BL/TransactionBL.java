@@ -6,18 +6,17 @@ import myBankApplication.dao.AccountDao;
 import myBankApplication.dao.TransactionDao;
 import myBankApplication.exceptions.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import javax.security.auth.login.AccountNotFoundException;
 import java.util.Optional;
-
+@Service
 public class TransactionBL {
 
 
     @Autowired
     private TransactionDao transactionDao;
 
-    @Autowired
-    private TransactionBL transactionBL;
 
     @Autowired
     private AccountBL accountBL;
