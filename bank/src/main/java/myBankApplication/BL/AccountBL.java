@@ -16,16 +16,17 @@ import java.util.Optional;
 public class AccountBL {
 
     @Autowired
-    private AccountDAO accountDao;
+    private AccountDAO accountDAO;
 
     @Autowired
-    private CustomerBL customerLB;
+    private CustomerBL customerBL;
+
 
 
     public boolean checkAccount(Account account) throws AccountsAlreadyExistException, AccountBalanceErrorException, AccountCategoryErrorException, AccountPasswordErrorException {
 
 
-        Optional<Account> existingAccount = this.accountDao.findById(account.getAccountId());
+        Optional<Account> existingAccount = this.accountDAO.findById(account.getAccountId());
         if (existingAccount.isPresent()) {
             throw new AccountsAlreadyExistException();
         }
@@ -46,24 +47,24 @@ public class AccountBL {
 
     public void addNewAccount(Account account , int id) throws CustomerNotFoundException, AccountsAlreadyExistException, AccountBalanceErrorException, AccountPasswordErrorException, AccountCategoryErrorException {
 
-        if(getCustomer(id) ==null){
+        if(this.customerBL.getCustomer(id) ==null){
             throw new CustomerNotFoundException();
         }
         if(checkAccount( account)){
-            this.accountDao.save(account);
+            this.accountDAO.save(account);
         }
     }
 
-    public Customer getCustomer(int id) throws CustomerNotFoundException {
-        Optional<Customer>customer = this.customerLB.getCustomerDoa().findById(id);
-        if(customer.isPresent()){
-            return customer.get();
-        }
-        throw new CustomerNotFoundException();
-    }
+//    public Customer getCustomer(int id) throws CustomerNotFoundException {
+//        Optional<Customer>customer = this.customerBL.getCustomerDao().findById(id);
+//        if(customer.isPresent()){
+//            return customer.get();
+//        }
+//        throw new CustomerNotFoundException();
+//    }
 
     public Account getAccount(int id) throws AccountNotFoundException {
-        Optional<Account>account = this.accountDao.findById(id);
+        Optional<Account>account = this.accountDAO.findById(id);
         if(account.isPresent()){
             return account.get();
         }

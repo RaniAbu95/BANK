@@ -35,15 +35,23 @@ public class CustomerBL {
         return true;
     }
 
+    public Customer getCustomer(int id) throws CustomerNotFoundException {
+        Optional<Customer> customer = this.customerDAO.findById(id);
+        if(customer.isPresent()){
+            return customer.get();
+        }
+        throw new CustomerNotFoundException();
+    }
 
-    public void addNewCustomer(Customer customer) throws CustomerEmailErrorException, CustomerLocationErrorException, EmailErrorException, CustomerIdErrorException, CustomerIsNotExistException {
+
+    public void addNewCustomer(Customer customer) throws CustomerEmailErrorException, CustomerLocationErrorException, CustomerIdErrorException, CustomerIsNotExistException {
         if(checkCustomer(customer)){
             customerDAO.save(customer);
         }
 
     }
 
-    public CustomerDAO getCustomerDoa() {
+    public CustomerDAO getCustomerDao() {
         return customerDAO;
     }
 
