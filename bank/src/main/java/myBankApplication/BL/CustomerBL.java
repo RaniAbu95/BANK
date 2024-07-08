@@ -1,8 +1,7 @@
 package myBankApplication.BL;
 
-import myBankApplication.beans.Account;
 import myBankApplication.beans.Customer;
-import myBankApplication.dao.CustomerDoa;
+import myBankApplication.dao.CustomerDAO;
 
 import myBankApplication.exceptions.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,16 +14,11 @@ import java.util.Optional;
 public class CustomerBL {
 
     @Autowired
-    private CustomerDoa customerDoa;
-    public Customer checkCustomer(Customer customer) throws CustomerIsNotExistException, EmailErrorException, CustomerEmailErrorException, CustomerIdErrorException, CustomerLocationErrorException {
-        //have to take the parameters from customer opject to create new account
+    private CustomerDAO customerDAO;
+    public boolean checkCustomer(Customer customer) throws CustomerIsNotExistException, CustomerEmailErrorException, CustomerIdErrorException, CustomerLocationErrorException {
+        Optional<Customer> existingCustomer = this.customerDAO.findById(customer.getCustomerId());
 
-
-        Optional<Customer> existingCustomer= Optional.ofNullable(this.customerDoa.findById(customer.getId()));
-        //Create intercase Dao
-        //create findById function
-        //create in class getId getter
-        if(existingCustomer == null){
+        if(existingCustomer.isPresent()){
             throw new CustomerIsNotExistException();
         }
         if(customer.getEmail()==null){
@@ -38,27 +32,22 @@ public class CustomerBL {
             throw new CustomerIdErrorException();
         }
 
-        return this.customerDoa.save(customer);
+        return true;
     }
-    public Customer getCustomer(int id) throws CustomerNotFoundException {
-        Optional<Customer>customer = Optional.ofNullable(this.customerDoa.findById(id));
-        if(customer.isPresent()){
-            return customer.get();
+
+
+    public void addNewCustomer(Customer customer) throws CustomerEmailErrorException, CustomerLocationErrorException, EmailErrorException, CustomerIdErrorException, CustomerIsNotExistException {
+        if(checkCustomer(customer)){
+            customerDAO.save(customer);
         }
-        throw new CustomerNotFoundException();
+
     }
 
+    public CustomerDAO getCustomerDoa() {
+        return customerDAO;
+    }
 
-    public Customer createNewCustomer(Customer customer) throws CustomerEmailErrorException, CustomerLocationErrorException, EmailErrorException, CustomerIdErrorException, CustomerIsNotExistException, CustomerNotFoundException {
-
-//        if(getCustomer(id).getCustomerId() ==null){
-//            throw new CustomerNotFoundException();
-//        }
-
-
-        Customer customerToAdd = checkCustomer( customer);
-
-
-        return  customerToAdd;
+    public void setCustomerDoa(CustomerDAO customerDAO) {
+        this.customerDAO = customerDAO;
     }
 }

@@ -6,7 +6,7 @@ import jakarta.persistence.*;
 import java.util.List;
 
 @Entity
-@Table(name="loan")
+@Table(name="loans")
 public class Loan {
 
     @Id
@@ -22,9 +22,13 @@ public class Loan {
     @Column(name="interset_rate")
     private float intersetRate;
 
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "account_id")
-    //private Account account;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "account_id")
+    private Account account;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "customer_id")
+    private Customer customer;
 
 
 

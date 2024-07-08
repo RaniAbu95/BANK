@@ -5,7 +5,7 @@ import jakarta.persistence.*;
 import java.util.Date;
 
 @Entity
-@Table(name = "visa_card")
+@Table(name = "visa_cards")
 public class VisaCard {
 
     @Id

@@ -22,21 +22,44 @@ public class Account {
     @JoinColumn(name = "customer_id")
     private Customer customer;
 
-//
-//    @OneToMany(mappedBy = "account", fetch = FetchType.LAZY)
-//    private List<Loan> loan;
-//
-//
+
+    @OneToMany(mappedBy = "account", fetch = FetchType.LAZY)
+    private List<Loan> loans;
+
+
     @OneToMany(mappedBy = "account", fetch = FetchType.LAZY)
     private List<VisaCard> visaCards;
 
 
     public Account(){};
-    public Account(String balance, int accountId, String category, String password) {
+    public Account(String balance, String category, String password) {
         this.balance = balance;
-        this.accountId = accountId;
         this.category = category;
         Password = password;
+    }
+
+    public Customer getCustomer() {
+        return customer;
+    }
+
+    public void setCustomer(Customer customer) {
+        this.customer = customer;
+    }
+
+    public List<Loan> getLoans() {
+        return loans;
+    }
+
+    public void setLoans(List<Loan> loan) {
+        this.loans = loans;
+    }
+
+    public List<VisaCard> getVisaCards() {
+        return visaCards;
+    }
+
+    public void setVisaCards(List<VisaCard> visaCards) {
+        this.visaCards = visaCards;
     }
 
     public int getAccountId() {

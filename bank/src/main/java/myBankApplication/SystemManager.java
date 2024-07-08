@@ -42,25 +42,19 @@ public class SystemManager {
     public void run() throws CustomerEmailErrorException, CustomerLocationErrorException, EmailErrorException, CustomerIdErrorException, CustomerIsNotExistException, LoanAlreadyExistException, LoanTypeErrorException, LoanAmountErrorException, AccountNotFoundException, AccountsAlreadyExistException, AccountBalanceErrorException, AccountPasswordErrorException, CustomerNotFoundException, AccountCategoryErrorException {
 
         System.out.println("Adding customer to database");
-        Customer customer = new Customer("New York", "john_doe", 123456, "john.doe@example.com");
 
+        Customer customer = new Customer();
+        customer.setLocation("New York");
+        customer.setUsername("john_doe");
+        customer.setEmail("john.doe@example.com");
 
+        customerBL.addNewCustomer(customer);
 
-        //System.out.println("Adding account to database");
-        Account account = new Account("1000", 1, "Savings", "password123456");
+        System.out.println("Adding account to database");
+        Account account = new Account("1000", "Savings", "password123456");
+        account.setCustomer(customer);
+        accountBL.addNewAccount(account,customer.getCustomerId());
 
-        customerBL.createNewCustomer(customer);
-
-        //accountBL.createNewAccount(account,customer.getCustomerId());
-
-
-
-
-
-
-
-
-//        accountBL.createAccount(account);
 
 
 

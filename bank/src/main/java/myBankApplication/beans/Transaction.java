@@ -6,7 +6,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import java.time.Instant;
 
 @Entity
-@Table(name="Transaction")
+@Table(name="Transactions")
 public class Transaction {
 
 
