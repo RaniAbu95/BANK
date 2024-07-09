@@ -1,8 +1,7 @@
 package myBankApplication.BL;
 
-import myBankApplication.beans.Account;
 import myBankApplication.beans.VisaCard;
-import myBankApplication.dao.VisaCardDao;
+import myBankApplication.dao.VisaCardDAO;
 import myBankApplication.exceptions.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -13,11 +12,9 @@ import java.util.Optional;
 public class VisaCardBL {
 
     @Autowired
-    private VisaCardDao  visaCardDao;
+    private VisaCardDAO visaCardDao;
     @Autowired
     private AccountBL accountBL;
-
-
 
     public VisaCard checkVisaCard(VisaCard visaCard) throws VisaCardAlreadyExistException, VisaCardNumberErrorException, ExpiredDateErrorException, CompanyErrorException, VVCErrorException, LimitErrorException, StatusErrorException {
 
@@ -39,7 +36,7 @@ public class VisaCardBL {
         if(visaCard.getVvc()==null){
             throw new VVCErrorException();
         }
-        if(visaCard.getLimit()==null){
+        if(visaCard.getCredit()==null){
             throw new LimitErrorException();
         }
         if(visaCard.getStatus()==null){

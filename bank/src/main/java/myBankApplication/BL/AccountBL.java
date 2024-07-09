@@ -2,7 +2,7 @@ package myBankApplication.BL;
 
 import myBankApplication.beans.Account;
 import myBankApplication.beans.Customer;
-import myBankApplication.dao.AccountDao;
+import myBankApplication.dao.AccountDAO;
 import myBankApplication.exceptions.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,47 +16,55 @@ import java.util.Optional;
 public class AccountBL {
 
     @Autowired
-    private AccountDao accountDao;
+    private AccountDAO accountDAO;
 
     @Autowired
-    private CustomerBL customerLB;
+    private CustomerBL customerBL;
 
 
-    public Account checkAccount(Account accounts) throws AccountsAlreadyExistException, AccountBalanceErrorException, AccountCategoryErrorException, AccountPasswordErrorException {
+
+    public boolean checkAccount(Account account) throws AccountsAlreadyExistException, AccountBalanceErrorException, AccountCategoryErrorException, AccountPasswordErrorException {
 
 
-        Optional<Account> existingAccount = Optional.ofNullable(this.accountDao.findById(accounts.getAccountId()));
+        Optional<Account> existingAccount = this.accountDAO.findById(account.getAccountId());
         if (existingAccount.isPresent()) {
             throw new AccountsAlreadyExistException();
         }
 
-        if(accounts.getBalance()==null){
+        if(account.getBalance()==null){
             throw new AccountBalanceErrorException();
         }
-        if(accounts.getCategory() ==null){
+        if(account.getCategory() ==null){
             throw new AccountCategoryErrorException();
         }
-        if(accounts.getPassword() == null){
+        if(account.getPassword() == null){
             throw new AccountPasswordErrorException();
         }
 
-        return this.accountDao.save(accounts);
+        return true;
     }
 
 
-    public Account createNewAccount(Account accounts , int id) throws CustomerNotFoundException, AccountsAlreadyExistException, AccountBalanceErrorException, AccountPasswordErrorException, AccountCategoryErrorException {
+    public void addNewAccount(Account account , int id) throws CustomerNotFoundException, AccountsAlreadyExistException, AccountBalanceErrorException, AccountPasswordErrorException, AccountCategoryErrorException {
 
-        if(customerLB.getCustomer(id) ==null){
+        if(this.customerBL.getCustomer(id) ==null){
             throw new CustomerNotFoundException();
         }
-
-
-        accounts = checkAccount( accounts);
-        return  accounts;
+        if(checkAccount( account)){
+            this.accountDAO.save(account);
+        }
     }
 
+//    public Customer getCustomer(int id) throws CustomerNotFoundException {
+//        Optional<Customer>customer = this.customerBL.getCustomerDao().findById(id);
+//        if(customer.isPresent()){
+//            return customer.get();
+//        }
+//        throw new CustomerNotFoundException();
+//    }
+
     public Account getAccount(int id) throws AccountNotFoundException {
-        Optional<Account>account = Optional.ofNullable(this.accountDao.findById(id));
+        Optional<Account>account = this.accountDAO.findById(id);
         if(account.isPresent()){
             return account.get();
         }

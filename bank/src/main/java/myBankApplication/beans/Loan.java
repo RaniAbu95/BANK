@@ -6,7 +6,7 @@ import jakarta.persistence.*;
 import java.util.List;
 
 @Entity
-@Table(name="loan")
+@Table(name="loans")
 public class Loan {
 
     @Id
@@ -26,25 +26,29 @@ public class Loan {
     @JoinColumn(name = "account_id")
     private Account account;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "customer_id")
+    private Customer customer;
+
 
 
     public Loan(){}
-    public Loan(int loanId, String loanType, float amount, float intersetRate, Account account) {
+    public Loan(int loanId, String loanType, float amount, float intersetRate) {
         this.loanId = loanId;
         this.loanType = loanType;
         this.amount = amount;
         this.intersetRate = intersetRate;
-        this.account = account;
+        //this.account = null; // change this
     }
 
 
-    public Account getAccount() {
-        return account;
-    }
-
-    public void setAccount(Account account) {
-        this.account = account;
-    }
+//    public Account getAccount() {
+//        return account;
+//    }
+//
+//    public void setAccount(Account account) {
+//        this.account = account;
+//    }
 
     public int getLoanId() {
         return loanId;

@@ -5,7 +5,7 @@ import jakarta.persistence.*;
 import java.util.Date;
 
 @Entity
-@Table(name = "VisaCard")
+@Table(name = "visa_cards")
 public class VisaCard {
 
     @Id
@@ -19,8 +19,8 @@ public class VisaCard {
     private int vvc;
     @Column(name = "company")
     private String company;
-    @Column(name = "limit")
-    private int limit;
+    @Column(name = "credit")
+    private int credit;
     @Column(name = "Status")
     private String status;
 
@@ -35,7 +35,7 @@ public class VisaCard {
 
     public VisaCard(String status, int limit, String company, int vvc, Date expiredDate, long visaCardNumber) {
         this.status = status;
-        this.limit = limit;
+        this.credit = limit;
         this.company = company;
         this.vvc = vvc;
         this.expiredDate = expiredDate;
@@ -46,12 +46,12 @@ public class VisaCard {
         return visaCardId;
     }
 
-    public Integer getLimit() {
-        return limit;
+    public Integer getCredit() {
+        return credit;
     }
 
-    public void setLimit(int limit) {
-        this.limit = limit;
+    public void setCredit(int limit) {
+        this.credit = limit;
     }
 
     public String getCompany() {

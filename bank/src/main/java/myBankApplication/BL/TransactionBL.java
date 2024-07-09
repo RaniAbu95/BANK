@@ -1,23 +1,20 @@
 package myBankApplication.BL;
 
-import myBankApplication.beans.Account;
 import myBankApplication.beans.Transaction;
-import myBankApplication.dao.AccountDao;
-import myBankApplication.dao.TransactionDao;
+import myBankApplication.dao.TransactionDAO;
 import myBankApplication.exceptions.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import javax.security.auth.login.AccountNotFoundException;
 import java.util.Optional;
-
+@Service
 public class TransactionBL {
 
 
     @Autowired
-    private TransactionDao transactionDao;
+    private TransactionDAO transactionDao;
 
-    @Autowired
-    private TransactionBL transactionBL;
 
     @Autowired
     private AccountBL accountBL;

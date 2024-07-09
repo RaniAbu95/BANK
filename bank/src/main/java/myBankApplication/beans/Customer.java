@@ -9,11 +9,10 @@ import java.util.List;
 public class Customer {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
-
-
-    @Column(name="CustomerId")
     private int customerId;
+
+
+
     @Column(name="UserName")
     private String username;
     @Column(name="Email")
@@ -26,17 +25,31 @@ public class Customer {
     private List<Account> accounts;
 
 
-    @OneToMany(mappedBy = "account", fetch = FetchType.LAZY)
-    private List<Loan> loan;
+    @OneToMany(mappedBy = "customer", fetch = FetchType.LAZY)
+    private List<Loan> loans;
 
     public Customer(){};
-    public Customer(String location, String username, int customerId, String email) {
+    public Customer(String location, String username, String email) {
         Location = location;
         this.username = username;
-        this.customerId = customerId;
         this.email = email;
     }
 
+    public List<Account> getAccounts() {
+        return accounts;
+    }
+
+    public void setAccounts(List<Account> accounts) {
+        this.accounts = accounts;
+    }
+
+    public List<Loan> getLoan() {
+        return loans;
+    }
+
+    public void setLoan(List<Loan> loan) {
+        this.loans = loan;
+    }
 
     public String getLocation() {
         return Location;
@@ -70,11 +83,5 @@ public class Customer {
         this.customerId = customerId;
     }
 
-    public int getId() {
-        return id;
-    }
 
-    public void setId(int id) {
-        this.id = id;
-    }
 }
