@@ -1,4 +1,2 @@
-package myBankApplication.beans;
-
-public class CurrencyExchangeRate {
+package myBankApplication.beans;public class CurrencyExchangeRate {
 }
