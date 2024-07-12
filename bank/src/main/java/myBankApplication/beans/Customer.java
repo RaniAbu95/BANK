@@ -25,8 +25,6 @@ public class Customer {
     private List<Account> accounts;
 
 
-    @OneToMany(mappedBy = "customer", fetch = FetchType.LAZY)
-    private List<Loan> loans;
 
     public Customer(){};
     public Customer(String location, String username, String email) {
@@ -43,13 +41,6 @@ public class Customer {
         this.accounts = accounts;
     }
 
-    public List<Loan> getLoan() {
-        return loans;
-    }
-
-    public void setLoan(List<Loan> loan) {
-        this.loans = loan;
-    }
 
     public String getLocation() {
         return Location;

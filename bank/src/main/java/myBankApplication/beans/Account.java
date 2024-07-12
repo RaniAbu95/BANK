@@ -22,20 +22,31 @@ public class Account {
     @JoinColumn(name = "customer_id")
     private Customer customer;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "banker_id")
+    private Banker banker;
+
 
     @OneToMany(mappedBy = "account", fetch = FetchType.LAZY)
     private List<Loan> loans;
+
+    @OneToMany(mappedBy = "account", fetch = FetchType.LAZY)
+    private List<Transaction> transactions;
 
 
     @OneToMany(mappedBy = "account", fetch = FetchType.LAZY)
     private List<VisaCard> visaCards;
 
 
-    public Account(){};
     public Account(String balance, String category, String password) {
         this.balance = balance;
         this.category = category;
-        Password = password;
+        this.Password = password;
+
+    }
+
+    public Account() {
+
     }
 
     public Customer getCustomer() {
@@ -46,13 +57,6 @@ public class Account {
         this.customer = customer;
     }
 
-    public List<Loan> getLoans() {
-        return loans;
-    }
-
-    public void setLoans(List<Loan> loan) {
-        this.loans = loans;
-    }
 
     public List<VisaCard> getVisaCards() {
         return visaCards;

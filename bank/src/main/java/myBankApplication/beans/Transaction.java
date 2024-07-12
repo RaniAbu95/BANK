@@ -20,7 +20,12 @@ public class Transaction {
     @Column(name="Target")
     private String target;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "account_id")
+    private Account account;
 
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "transaction")
+    private CurrencyExchangeRate currencyExchangeRate;
 
     public Transaction() {
     }

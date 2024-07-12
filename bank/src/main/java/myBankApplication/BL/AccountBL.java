@@ -55,13 +55,6 @@ public class AccountBL {
         }
     }
 
-//    public Customer getCustomer(int id) throws CustomerNotFoundException {
-//        Optional<Customer>customer = this.customerBL.getCustomerDao().findById(id);
-//        if(customer.isPresent()){
-//            return customer.get();
-//        }
-//        throw new CustomerNotFoundException();
-//    }
 
     public Account getAccount(int id) throws AccountNotFoundException {
         Optional<Account>account = this.accountDAO.findById(id);
