@@ -16,7 +16,7 @@ public class BankApplication {
 		ApplicationContext context = SpringApplication.run(BankApplication.class, args);
 		System.out.println("Hello world");
 		SystemManager manager = context.getBean(SystemManager.class);
-		manager.run();
+		//manager.run();
 
 	}
 

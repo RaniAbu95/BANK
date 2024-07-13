@@ -1,6 +1,8 @@
 package myBankApplication.beans;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.List;
 
@@ -12,9 +14,10 @@ public class Account {
     private int accountId;
 
     @Column(name="balance")
-    private String balance;
+    private int balance;
     @Column(name="category")
     private String category;
+    @Getter
     @Column(name="password")
     private String Password;
 
@@ -38,15 +41,58 @@ public class Account {
     private List<VisaCard> visaCards;
 
 
-    public Account(String balance, String category, String password) {
-        this.balance = balance;
+    public Account( String category, String password) {
+        this.balance = 0;
         this.category = category;
         this.Password = password;
 
     }
 
+    @Override
+    public String toString() {
+        return "Account{" +
+                "accountId=" + accountId +
+                ", balance='" + balance + '\'' +
+                ", category='" + category + '\'' +
+                ", Password='" + Password + '\'' +
+                ", customer=" + this.customer +
+//                ", banker=" + banker +
+//                ", loans=" + loans +
+//                ", transactions=" + transactions +
+//                ", visaCards=" + visaCards +
+                '}';
+    }
+
     public Account() {
 
+    }
+
+    public String getPassword() {
+        return Password;
+    }
+
+    public Banker getBanker() {
+        return banker;
+    }
+
+    public void setBanker(Banker banker) {
+        this.banker = banker;
+    }
+
+    public List<Transaction> getTransactions() {
+        return transactions;
+    }
+
+    public void setTransactions(List<Transaction> transactions) {
+        this.transactions = transactions;
+    }
+
+    public List<Loan> getLoans() {
+        return loans;
+    }
+
+    public void setLoans(List<Loan> loans) {
+        this.loans = loans;
     }
 
     public Customer getCustomer() {
@@ -74,11 +120,11 @@ public class Account {
         this.accountId = accountId;
     }
 
-    public String getBalance() {
+    public int getBalance() {
         return balance;
     }
 
-    public void setBalance(String balance) {
+    public void setBalance(int balance) {
         this.balance = balance;
     }
 
@@ -88,10 +134,6 @@ public class Account {
 
     public void setCategory(String category) {
         this.category = category;
-    }
-
-    public String getPassword() {
-        return Password;
     }
 
     public void setPassword(String password) {

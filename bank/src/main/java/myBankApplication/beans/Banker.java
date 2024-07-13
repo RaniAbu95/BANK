@@ -11,9 +11,11 @@ public class Banker {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int bankerId;
     @Column(name="name")
-    private String balance;
+    private String name;
     @Column(name="email")
     private String email;
+    @Column (name="number_of_accounts")
+    private int numberOfAccounts;
 
     //
     @OneToMany(mappedBy = "banker", fetch = FetchType.LAZY)
@@ -21,10 +23,34 @@ public class Banker {
 
 
 
-    public Banker() {}
-    public Banker(String balance, String email) {
-        this.balance = balance;
+    public Banker(String name, String email) {
+        this.name = name;
         this.email = email;
+        this.numberOfAccounts = 0;
+    }
+
+    public Banker() {
+
+    }
+
+    public int getNumberOfAccounts() {
+        return numberOfAccounts;
+    }
+
+    public void setNumberOfAccounts(int numberOfAccounts) {
+        this.numberOfAccounts = numberOfAccounts;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public List<Account> getAccounts() {
+        return accounts;
+    }
+
+    public void setAccounts(List<Account> accounts) {
+        this.accounts = accounts;
     }
 
     public int getBankerId() {
@@ -35,12 +61,12 @@ public class Banker {
         this.bankerId = bankerId;
     }
 
-    public String getBalance() {
-        return balance;
+    public String getName() {
+        return name;
     }
 
     public void setBalance(String balance) {
-        this.balance = balance;
+        this.name = balance;
     }
 
     public String getEmail() {
@@ -49,5 +75,16 @@ public class Banker {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    @Override
+    public String toString() {
+        return "Banker{" +
+                "bankerId=" + bankerId +
+                ", name='" + name + '\'' +
+                ", email='" + email + '\'' +
+                ", numberOfAccounts=" + numberOfAccounts +
+                //", accounts=" + accounts +
+                '}';
     }
 }
