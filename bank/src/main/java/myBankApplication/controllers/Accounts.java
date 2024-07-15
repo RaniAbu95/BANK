@@ -22,7 +22,7 @@ public class Accounts {
     private BankerBL bankerBL;
 
     @PostMapping("add")
-    public String add(int customerId, String balance, String category,String password) throws AccountsAlreadyExistException, AccountBalanceErrorException, AccountPasswordErrorException, CustomerNotFoundException, AccountCategoryErrorException, AccountNotFoundException//Params passed as query string
+    public String add(int customerId,String category,String password) throws AccountsAlreadyExistException, AccountBalanceErrorException, AccountPasswordErrorException, CustomerNotFoundException, AccountCategoryErrorException, AccountNotFoundException//Params passed as query string
     {
         Account account = new Account(category, password);
         account.setCustomer(accountBL.getCustomer(customerId));
@@ -41,7 +41,7 @@ public class Accounts {
     }
 
     @GetMapping("getAll")
-    public List<Account> getAllAccounts() throws AccountsAlreadyExistException {
+    public List<Account> getAllAccounts() {
         return accountBL.getAllAccounts();
     }
 
@@ -50,4 +50,8 @@ public class Accounts {
     {
         this.accountBL.updateAccountBalance(newBalance,accountId);
     }
+
+
+
+
 }

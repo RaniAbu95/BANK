@@ -33,6 +33,7 @@ public class Customer {
         this.email = email;
     }
 
+
     public List<Account> getAccounts() {
         return accounts;
     }
@@ -74,5 +75,14 @@ public class Customer {
         this.customerId = customerId;
     }
 
-
+    @Override
+    public String toString() {
+        return "Customer{" +
+                "customerId=" + customerId +
+                ", username='" + username + '\'' +
+                ", email='" + email + '\'' +
+                ", Location='" + Location + '\'' +
+                //", accounts=" + accounts +
+                '}';
+    }
 }

@@ -1,7 +1,6 @@
 package myBankApplication.BL;
 
 import myBankApplication.beans.Account;
-import myBankApplication.beans.Banker;
 import myBankApplication.beans.Customer;
 import myBankApplication.dao.AccountDAO;
 import myBankApplication.exceptions.*;
@@ -49,7 +48,6 @@ public class AccountBL {
             this.accountDAO.save(account);
         }
     }
-
 
 
     public Account getAccount(int id) throws AccountNotFoundException {

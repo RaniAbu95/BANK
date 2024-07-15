@@ -1,5 +1,6 @@
 package myBankApplication.BL;
 
+import myBankApplication.beans.Account;
 import myBankApplication.beans.Customer;
 import myBankApplication.dao.CustomerDAO;
 
@@ -7,6 +8,7 @@ import myBankApplication.exceptions.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 
@@ -58,4 +60,41 @@ public class CustomerBL {
     public void setCustomerDoa(CustomerDAO customerDAO) {
         this.customerDAO = customerDAO;
     }
+
+    public List<Customer> getAllCustomers() throws CustomerNotFoundException {
+        return this.customerDAO.findAll();
+    }
+
+    public Customer updateCustomerEmail(int customerId, String newEmail) throws CustomerNotFoundException {
+        //check the email authintication
+        Optional<Customer> existingCustomer = this.customerDAO.findById(customerId);
+        if(existingCustomer.isPresent()){
+            customerDAO.updateCustomerEmail(customerId,newEmail);
+            existingCustomer.get().setEmail(newEmail);
+            return existingCustomer.get();
+        }
+        else {
+            throw new CustomerNotFoundException();
+
+        }
+    }
+
+    public Customer updateCustomerLocation(int customerId, String newLocation) throws CustomerNotFoundException {
+        //check the  authintication
+        Optional<Customer> existingCustomer = this.customerDAO.findById(customerId);
+        if(existingCustomer.isPresent()){
+            customerDAO.updateCustomerLocation(customerId,newLocation);
+            //existingCustomer.get().setLocation(newLocation);
+            //return this.customerDAO.findById(customerId).get();
+
+            return getCustomer(customerId);
+        }
+        else {
+            throw new CustomerNotFoundException();
+        }
+
+    }
+
+
+
 }
