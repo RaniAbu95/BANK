@@ -22,13 +22,18 @@ public class AccountBL {
     @Autowired
     private CustomerBL customerBL;
 
-    public void checkAccount(Account account) throws AccountsAlreadyExistException, AccountBalanceErrorException, AccountCategoryErrorException, AccountPasswordErrorException {
+    @Autowired
+    private BankerBL bankerBL;
+
+    public void checkAccount(Account account, int customerId) throws AccountsAlreadyExistException,  AccountCategoryErrorException, AccountPasswordErrorException, CustomerNotFoundException {
 
         Optional<Account> existingAccount = this.accountDAO.findById(account.getAccountId());
         if (existingAccount.isPresent()) {
             throw new AccountsAlreadyExistException();
         }
-
+        if(getCustomer( customerId) ==null){
+            throw new CustomerNotFoundException();
+        }
         if(account.getCategory() ==null){
             throw new AccountCategoryErrorException();
         }
@@ -39,12 +44,8 @@ public class AccountBL {
     }
 
 
-    public void addNewAccount(Account account , int customerId) throws CustomerNotFoundException, AccountsAlreadyExistException, AccountBalanceErrorException, AccountPasswordErrorException, AccountCategoryErrorException, AccountNotSavedInDataBaseErrorException {
-
-        if(getCustomer( customerId) ==null){
-            throw new CustomerNotFoundException();
-        }
-        checkAccount(account);
+    public void addNewAccount(Account account , int customerId) throws CustomerNotFoundException, AccountsAlreadyExistException,  AccountPasswordErrorException, AccountCategoryErrorException, AccountNotSavedInDataBaseErrorException {
+        checkAccount(account,customerId);
         saveAccountInDataBase(account);
     }
 
@@ -64,11 +65,21 @@ public class AccountBL {
         return this.customerBL.getCustomer(id);
     }
 
-    public void updateAccountBalance(int bankerId,int newBalance) throws AccountNotFoundException {
-        this.accountDAO.updateAccountBalance(bankerId,newBalance);
+    public int getAccountBalance(int accountId) throws AccountNotFoundException {
+        Optional<Account> account = this.accountDAO.findById(accountId);
+        if(account.isPresent()){
+            return account.get().getBalance();
+        }
+        else {
+            throw new AccountNotFoundException();
+        }
     }
 
-    public boolean saveAccountInDataBase(Account account) throws AccountsAlreadyExistException, AccountCategoryErrorException, AccountPasswordErrorException, AccountNotSavedInDataBaseErrorException {
+    public void updateAccountBalance(int accountId,int newBalance) throws AccountNotFoundException {
+        this.accountDAO.updateAccountBalance(accountId,newBalance);
+    }
+
+    public boolean saveAccountInDataBase(Account account) throws AccountNotSavedInDataBaseErrorException {
         try{
             this.accountDAO.save(account);
             return true;
@@ -76,5 +87,9 @@ public class AccountBL {
         catch(Exception e){
             throw new AccountNotSavedInDataBaseErrorException();
         }
+    }
+
+    public BankerBL getBankerBl() {
+        return this.bankerBL;
     }
 }
