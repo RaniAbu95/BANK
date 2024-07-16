@@ -18,19 +18,16 @@ public class Accounts {
     @Autowired
     private AccountBL accountBL;
 
-    @Autowired
-    private BankerBL bankerBL;
 
     @PostMapping("add")
-    public String add(int customerId,String category,String password) throws AccountsAlreadyExistException, AccountBalanceErrorException, AccountPasswordErrorException, CustomerNotFoundException, AccountCategoryErrorException, AccountNotFoundException//Params passed as query string
+    public String add(int customerId,String category,String password) throws AccountsAlreadyExistException, AccountBalanceErrorException, AccountPasswordErrorException, CustomerNotFoundException, AccountCategoryErrorException, AccountNotFoundException, AccountNotSavedInDataBaseErrorException//Params passed as query string
     {
         Account account = new Account(category, password);
         account.setCustomer(accountBL.getCustomer(customerId));
-        Banker banker = bankerBL.getBankerWithMinAccounts();
+        Banker banker = accountBL.getBankerBl().getBankerWithMinAccounts();
         account.setBanker(banker);
-        bankerBL.updateBankerAccounts(banker.getBankerId());
+        this.accountBL.getBankerBl().updateBankerAccounts(banker.getBankerId());
         accountBL.addNewAccount(account,customerId);
-
         return account.toString();
     }
 
@@ -50,6 +47,7 @@ public class Accounts {
     {
         this.accountBL.updateAccountBalance(newBalance,accountId);
     }
+
 
 
 
