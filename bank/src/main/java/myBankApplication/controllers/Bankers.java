@@ -22,8 +22,7 @@ public class Bankers {
         private BankerBL bankerBL;
 
         @PostMapping("add")
-        public String add(String name, String email) throws BankerEmailErrorException, BankerNameErrorException
-        {
+        public String add(String name, String email) throws BankerEmailErrorException, BankerNameErrorException, BankerNotSavedInDataBaseErrorException {
             Banker banker = new Banker(name, email);
             bankerBL.addNewBanker(banker);
             return banker.toString();

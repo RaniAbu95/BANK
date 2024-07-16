@@ -6,6 +6,7 @@ import myBankApplication.dao.AccountDAO;
 import myBankApplication.exceptions.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 
@@ -23,6 +24,7 @@ public class AccountBL {
     private CustomerBL customerBL;
 
     @Autowired
+    @Lazy
     private BankerBL bankerBL;
 
     public void checkAccount(Account account, int customerId) throws AccountsAlreadyExistException,  AccountCategoryErrorException, AccountPasswordErrorException, CustomerNotFoundException {
@@ -88,7 +90,6 @@ public class AccountBL {
             throw new AccountNotSavedInDataBaseErrorException();
         }
     }
-
     public BankerBL getBankerBl() {
         return this.bankerBL;
     }
