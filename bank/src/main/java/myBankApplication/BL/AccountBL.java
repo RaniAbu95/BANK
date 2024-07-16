@@ -49,7 +49,6 @@ public class AccountBL {
         }
     }
 
-
     public Account getAccount(int id) throws AccountNotFoundException {
         Optional<Account>account = this.accountDAO.findById(id);
         if(account.isPresent()){
