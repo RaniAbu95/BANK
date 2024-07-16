@@ -22,7 +22,7 @@ public class AccountBL {
     @Autowired
     private CustomerBL customerBL;
 
-    public boolean checkAccount(Account account) throws AccountsAlreadyExistException, AccountBalanceErrorException, AccountCategoryErrorException, AccountPasswordErrorException {
+    public void checkAccount(Account account) throws AccountsAlreadyExistException, AccountBalanceErrorException, AccountCategoryErrorException, AccountPasswordErrorException {
 
         Optional<Account> existingAccount = this.accountDAO.findById(account.getAccountId());
         if (existingAccount.isPresent()) {
@@ -36,17 +36,16 @@ public class AccountBL {
             throw new AccountPasswordErrorException();
         }
 
-        return true;
     }
 
 
-    public void addNewAccount(Account account , int customerId) throws CustomerNotFoundException, AccountsAlreadyExistException, AccountBalanceErrorException, AccountPasswordErrorException, AccountCategoryErrorException {
+    public void addNewAccount(Account account , int customerId) throws CustomerNotFoundException, AccountsAlreadyExistException, AccountBalanceErrorException, AccountPasswordErrorException, AccountCategoryErrorException, AccountNotSavedInDataBaseErrorException {
+
         if(getCustomer( customerId) ==null){
             throw new CustomerNotFoundException();
         }
-        if(checkAccount( account)){
-            this.accountDAO.save(account);
-        }
+        checkAccount(account);
+        saveAccountInDataBase(account);
     }
 
     public Account getAccount(int id) throws AccountNotFoundException {
@@ -67,5 +66,15 @@ public class AccountBL {
 
     public void updateAccountBalance(int bankerId,int newBalance) throws AccountNotFoundException {
         this.accountDAO.updateAccountBalance(bankerId,newBalance);
+    }
+
+    public boolean saveAccountInDataBase(Account account) throws AccountsAlreadyExistException, AccountCategoryErrorException, AccountPasswordErrorException, AccountNotSavedInDataBaseErrorException {
+        try{
+            this.accountDAO.save(account);
+            return true;
+        }
+        catch(Exception e){
+            throw new AccountNotSavedInDataBaseErrorException();
+        }
     }
 }
