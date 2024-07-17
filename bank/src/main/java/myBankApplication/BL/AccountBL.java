@@ -66,7 +66,18 @@ public class AccountBL {
         return this.customerBL.getCustomer(id);
     }
 
-    public void updateAccountBalance(int bankerId,int newBalance) throws AccountNotFoundException {
-        this.accountDAO.updateAccountBalance(bankerId,newBalance);
+
+    public int getAccountBalance(int accountId) throws AccountBalanceErrorException, AccountNotFoundException {
+        Optional<Account> account = this.accountDAO.findById(accountId);
+        if(account.isPresent()){
+            return account.get().getBalance();
+        }
+        else {
+            throw new AccountNotFoundException();
+        }
+    }
+
+    public void updateAccountBalance(int accountId,int newBalance) throws AccountNotFoundException {
+        this.accountDAO.updateAccountBalance(newBalance,accountId);
     }
 }
