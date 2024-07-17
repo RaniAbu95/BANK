@@ -66,10 +66,10 @@ public class CustomerBL {
         //check the email authintication
         Optional<Customer> customerToUpdate = this.customerDAO.findById(customerId);
         if(customerToUpdate.isPresent()){
-            //customerDAO.updateCustomerEmail(customerId,newEmail);
             customerToUpdate.get().setEmail(newEmail);
             saveCustomerInDataBase(customerToUpdate.get());
-            return customerToUpdate.get();
+            Optional<Customer> updatedCustomer = this.customerDAO.findById(customerId);
+            return updatedCustomer.get();
         }
         else {
             throw new CustomerNotFoundException();
@@ -83,7 +83,8 @@ public class CustomerBL {
         if (customerToUpdate.isPresent()) {
             customerToUpdate.get().setLocation(newLocation);
             saveCustomerInDataBase(customerToUpdate.get());
-            return customerToUpdate.get();
+            Optional<Customer> updatedCustomer = this.customerDAO.findById(customerId);
+            return updatedCustomer.get();
         } else {
             throw new CustomerNotFoundException();
         }
