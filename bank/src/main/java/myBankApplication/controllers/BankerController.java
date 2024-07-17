@@ -2,7 +2,6 @@ package myBankApplication.controllers;
 
 import myBankApplication.BL.AccountBL;
 import myBankApplication.BL.BankerBL;
-import myBankApplication.beans.Account;
 import myBankApplication.beans.Banker;
 import myBankApplication.exceptions.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +13,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/bankers")
-public class Bankers {
+public class BankerController {
         @Autowired
         private AccountBL accountBL;
 

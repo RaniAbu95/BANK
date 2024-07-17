@@ -54,7 +54,7 @@ public class BankerBL {
     }
 
     public Banker updateBankerAccounts(int bankerId){
-        this.bankerDAO.incrementNumberOfAccounts(bankerId);
+        //this.bankerDAO.incrementNumberOfAccounts(bankerId);
         return this.bankerDAO.findById(bankerId).get();
     }
 

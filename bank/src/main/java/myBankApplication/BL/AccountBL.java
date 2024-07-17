@@ -46,9 +46,10 @@ public class AccountBL {
     }
 
 
-    public void addNewAccount(Account account , int customerId) throws CustomerNotFoundException, AccountsAlreadyExistException,  AccountPasswordErrorException, AccountCategoryErrorException, AccountNotSavedInDataBaseErrorException {
+    public Account addNewAccount(Account account , int customerId) throws CustomerNotFoundException, AccountsAlreadyExistException,  AccountPasswordErrorException, AccountCategoryErrorException, AccountNotSavedInDataBaseErrorException {
         checkAccount(account,customerId);
         saveAccountInDataBase(account);
+        return account;
     }
 
     public Account getAccount(int id) throws AccountNotFoundException {
@@ -77,8 +78,13 @@ public class AccountBL {
         }
     }
 
-    public void updateAccountBalance(int accountId,int newBalance) throws AccountNotFoundException {
-        this.accountDAO.updateAccountBalance(accountId,newBalance);
+    public void updateAccountBalance(int accountId,int newBalance) throws AccountBalanceErrorException, AccountNotFoundException {
+        Account accountToUpdate =getAccount(accountId);
+        if(accountToUpdate.getRestriction() > newBalance){
+            throw new AccountBalanceErrorException();
+        }
+        accountToUpdate.setBalance(newBalance);
+        this.accountDAO.save(accountToUpdate);
     }
 
     public boolean saveAccountInDataBase(Account account) throws AccountNotSavedInDataBaseErrorException {
@@ -92,5 +98,17 @@ public class AccountBL {
     }
     public BankerBL getBankerBl() {
         return this.bankerBL;
+    }
+
+
+    public Account updateStatusToSuspend(int accountId) throws AccountNotFoundException, AccountNotSavedInDataBaseErrorException {
+        Optional<Account> account = this.accountDAO.findById(accountId);
+        if(account.isPresent()){
+            Account accountToUpdate =account.get();
+            accountToUpdate.setStatus("Suspend");
+            this.accountDAO.save(accountToUpdate);
+            return accountToUpdate;
+        }
+        throw new AccountNotFoundException();
     }
 }
