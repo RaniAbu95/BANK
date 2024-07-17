@@ -45,7 +45,7 @@ public class Customers {
 
     @PutMapping("updateLocation")
     public Customer updateCustomerLocation(@RequestParam int customerId, @RequestParam String newLocation) throws CustomerNotFoundException, CustomerNotSavedInDataBaseErrorException {
-        Customer updatedCustomer = this.customerBL.updateCustomerLocation(customerId, newLocation);
+        Customer updatedCustomer =  this.customerBL.updateCustomerLocation(customerId, newLocation);
         return updatedCustomer;
     }
 
