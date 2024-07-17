@@ -1,4 +1,4 @@
 package myBankApplication.controllers;
 
-public class Loans {
+public class LoanController {
 }

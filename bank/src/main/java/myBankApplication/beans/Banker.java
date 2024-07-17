@@ -1,5 +1,6 @@
 package myBankApplication.beans;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.util.List;
@@ -19,6 +20,7 @@ public class Banker {
 
     //
     @OneToMany(mappedBy = "banker", fetch = FetchType.LAZY)
+    @JsonIgnore
     private List<Account> accounts;
 
 
