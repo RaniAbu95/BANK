@@ -17,10 +17,10 @@ public class Loan {
     private String loanType;
 
     @Column(name="amount")
-    private float amount;
+    private int amount;
 
     @Column(name="interset_rate")
-    private float intersetRate;
+    private int intersetRate;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "account_id")
@@ -34,8 +34,7 @@ public class Loan {
 
 
     public Loan(){}
-    public Loan(int loanId, String loanType, float amount, float intersetRate) {
-        this.loanId = loanId;
+    public Loan(String loanType, int amount, int intersetRate) {
         this.loanType = loanType;
         this.amount = amount;
         this.intersetRate = intersetRate;
@@ -64,7 +63,7 @@ public class Loan {
         return amount;
     }
 
-    public void setAmount(float amount) {
+    public void setAmount(int amount) {
         this.amount = amount;
     }
 
@@ -72,7 +71,7 @@ public class Loan {
         return intersetRate;
     }
 
-    public void setIntersetRate(float intersetRate) {
+    public void setIntersetRate(int intersetRate) {
         this.intersetRate = intersetRate;
     }
 

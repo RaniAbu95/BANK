@@ -21,19 +21,17 @@ public class BankerBL {
     @Autowired
     private AccountBL accountBL;
 
-    public boolean checkBanker(Banker banker) throws BankerEmailErrorException, BankerNameErrorException {
+    public void checkBanker(Banker banker) throws BankerEmailErrorException, BankerNameErrorException {
         if(banker.getName()==null){
             throw new BankerNameErrorException();
         }
         if(banker.getEmail() ==null){
             throw new BankerEmailErrorException();
         }
-        return true;
     }
-    public void addNewBanker(Banker banker) throws BankerEmailErrorException, BankerNameErrorException {
-        if(checkBanker(banker)){
-            this.bankerDAO.save(banker);
-        }
+    public void addNewBanker(Banker banker) throws BankerEmailErrorException, BankerNameErrorException, BankerNotSavedInDataBaseErrorException {
+        checkBanker(banker);
+        saveBankerInDataBase(banker);
 
     }
 
@@ -55,9 +53,19 @@ public class BankerBL {
         throw new AccountNotFoundException();
     }
 
-    public Banker updateBankerAccounts(int bankerId) throws AccountNotFoundException {
-        this.bankerDAO.incrementNumberOfAccounts(bankerId);
+    public Banker updateBankerAccounts(int bankerId){
+        //this.bankerDAO.incrementNumberOfAccounts(bankerId);
         return this.bankerDAO.findById(bankerId).get();
+    }
+
+    public boolean saveBankerInDataBase(Banker banker) throws  BankerNotSavedInDataBaseErrorException {
+        try{
+            this.bankerDAO.save(banker);
+            return true;
+        }
+        catch(Exception e){
+            throw new BankerNotSavedInDataBaseErrorException();
+        }
     }
 
 

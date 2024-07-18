@@ -6,6 +6,7 @@ import myBankApplication.dao.AccountDAO;
 import myBankApplication.exceptions.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 
@@ -22,13 +23,19 @@ public class AccountBL {
     @Autowired
     private CustomerBL customerBL;
 
-    public boolean checkAccount(Account account) throws AccountsAlreadyExistException, AccountBalanceErrorException, AccountCategoryErrorException, AccountPasswordErrorException {
+    @Autowired
+    @Lazy
+    private BankerBL bankerBL;
+
+    public void checkAccount(Account account, int customerId) throws AccountsAlreadyExistException,  AccountCategoryErrorException, AccountPasswordErrorException, CustomerNotFoundException {
 
         Optional<Account> existingAccount = this.accountDAO.findById(account.getAccountId());
         if (existingAccount.isPresent()) {
             throw new AccountsAlreadyExistException();
         }
-
+        if(getCustomer( customerId) ==null){
+            throw new CustomerNotFoundException();
+        }
         if(account.getCategory() ==null){
             throw new AccountCategoryErrorException();
         }
@@ -36,19 +43,14 @@ public class AccountBL {
             throw new AccountPasswordErrorException();
         }
 
-        return true;
     }
 
 
-    public void addNewAccount(Account account , int customerId) throws CustomerNotFoundException, AccountsAlreadyExistException, AccountBalanceErrorException, AccountPasswordErrorException, AccountCategoryErrorException {
-        if(getCustomer( customerId) ==null){
-            throw new CustomerNotFoundException();
-        }
-        if(checkAccount( account)){
-            this.accountDAO.save(account);
-        }
+    public Account addNewAccount(Account account , int customerId) throws CustomerNotFoundException, AccountsAlreadyExistException,  AccountPasswordErrorException, AccountCategoryErrorException, AccountNotSavedInDataBaseErrorException {
+        checkAccount(account,customerId);
+        saveAccountInDataBase(account);
+        return account;
     }
-
 
     public Account getAccount(int id) throws AccountNotFoundException {
         Optional<Account>account = this.accountDAO.findById(id);
@@ -56,6 +58,10 @@ public class AccountBL {
             return account.get();
         }
         throw new AccountNotFoundException();
+    }
+
+    public int getAccountId(Account account) throws AccountNotFoundException {
+        return account.getAccountId();
     }
 
     public List<Account> getAllAccounts() {
@@ -66,8 +72,7 @@ public class AccountBL {
         return this.customerBL.getCustomer(id);
     }
 
-
-    public int getAccountBalance(int accountId) throws AccountBalanceErrorException, AccountNotFoundException {
+    public int getAccountBalance(int accountId) throws AccountNotFoundException {
         Optional<Account> account = this.accountDAO.findById(accountId);
         if(account.isPresent()){
             return account.get().getBalance();
@@ -77,7 +82,38 @@ public class AccountBL {
         }
     }
 
-    public void updateAccountBalance(int accountId,int newBalance) throws AccountNotFoundException {
-        this.accountDAO.updateAccountBalance(newBalance,accountId);
+
+    public void updateAccountBalance(int accountId,int newBalance) throws AccountBalanceErrorException, AccountNotFoundException {
+        Account accountToUpdate =getAccount(accountId);
+//        if(accountToUpdate.getRestriction() > newBalance){
+//            throw new AccountBalanceErrorException();
+//        }
+        accountToUpdate.setBalance(newBalance);
+        this.accountDAO.save(accountToUpdate);
+    }
+
+    public boolean saveAccountInDataBase(Account account) throws AccountNotSavedInDataBaseErrorException {
+        try{
+            this.accountDAO.save(account);
+            return true;
+        }
+        catch(Exception e){
+            throw new AccountNotSavedInDataBaseErrorException();
+        }
+    }
+    public BankerBL getBankerBl() {
+        return this.bankerBL;
+    }
+
+
+    public Account updateStatusToSuspend(int accountId) throws AccountNotFoundException, AccountNotSavedInDataBaseErrorException {
+        Optional<Account> account = this.accountDAO.findById(accountId);
+        if(account.isPresent()){
+            Account accountToUpdate =account.get();
+            accountToUpdate.setStatus("Suspend");
+            this.accountDAO.save(accountToUpdate);
+            return accountToUpdate;
+        }
+        throw new AccountNotFoundException();
     }
 }

@@ -17,7 +17,7 @@ public class CustomerBL {
 
     @Autowired
     private CustomerDAO customerDAO;
-    public boolean checkCustomer(Customer customer) throws CustomerIsNotExistException, CustomerEmailErrorException, CustomerIdErrorException, CustomerLocationErrorException {
+    public void checkCustomer(Customer customer) throws CustomerIsNotExistException, CustomerEmailErrorException, CustomerIdErrorException, CustomerLocationErrorException {
         Optional<Customer> existingCustomer = this.customerDAO.findById(customer.getCustomerId());
 
         if(existingCustomer.isPresent()){
@@ -34,7 +34,6 @@ public class CustomerBL {
             throw new CustomerIdErrorException();
         }
 
-        return true;
     }
 
     public Customer getCustomer(int id) throws CustomerNotFoundException {
@@ -46,11 +45,9 @@ public class CustomerBL {
     }
 
 
-    public void addNewCustomer(Customer customer) throws CustomerEmailErrorException, CustomerLocationErrorException, CustomerIdErrorException, CustomerIsNotExistException {
-        if(checkCustomer(customer)){
-            customerDAO.save(customer);
-        }
-
+    public void addNewCustomer(Customer customer) throws CustomerEmailErrorException, CustomerLocationErrorException, CustomerIdErrorException, CustomerIsNotExistException, CustomerNotSavedInDataBaseErrorException {
+        checkCustomer(customer);
+        saveCustomerInDataBase(customer);
     }
 
     public CustomerDAO getCustomerDao() {
@@ -65,13 +62,14 @@ public class CustomerBL {
         return this.customerDAO.findAll();
     }
 
-    public Customer updateCustomerEmail(int customerId, String newEmail) throws CustomerNotFoundException {
+    public Customer updateCustomerEmail(int customerId, String newEmail) throws CustomerNotFoundException, CustomerNotSavedInDataBaseErrorException {
         //check the email authintication
-        Optional<Customer> existingCustomer = this.customerDAO.findById(customerId);
-        if(existingCustomer.isPresent()){
-            customerDAO.updateCustomerEmail(customerId,newEmail);
-            existingCustomer.get().setEmail(newEmail);
-            return existingCustomer.get();
+        Optional<Customer> customerToUpdate = this.customerDAO.findById(customerId);
+        if(customerToUpdate.isPresent()){
+            customerToUpdate.get().setEmail(newEmail);
+            saveCustomerInDataBase(customerToUpdate.get());
+            Optional<Customer> updatedCustomer = this.customerDAO.findById(customerId);
+            return updatedCustomer.get();
         }
         else {
             throw new CustomerNotFoundException();
@@ -79,22 +77,28 @@ public class CustomerBL {
         }
     }
 
-    public Customer updateCustomerLocation(int customerId, String newLocation) throws CustomerNotFoundException {
+    public Customer updateCustomerLocation(int customerId, String newLocation) throws CustomerNotFoundException, CustomerNotSavedInDataBaseErrorException {
         //check the  authintication
-        Optional<Customer> existingCustomer = this.customerDAO.findById(customerId);
-        if(existingCustomer.isPresent()){
-            customerDAO.updateCustomerLocation(customerId,newLocation);
-            //existingCustomer.get().setLocation(newLocation);
-            //return this.customerDAO.findById(customerId).get();
-
-            return getCustomer(customerId);
-        }
-        else {
+        Optional<Customer> customerToUpdate = this.customerDAO.findById(customerId);
+        if (customerToUpdate.isPresent()) {
+            customerToUpdate.get().setLocation(newLocation);
+            saveCustomerInDataBase(customerToUpdate.get());
+            Optional<Customer> updatedCustomer = this.customerDAO.findById(customerId);
+            return updatedCustomer.get();
+        } else {
             throw new CustomerNotFoundException();
+        }
+    }
+
+        public boolean saveCustomerInDataBase(Customer customer) throws CustomerNotSavedInDataBaseErrorException {
+            try{
+                this.customerDAO.save(customer);
+                return true;
+            }
+            catch(Exception e){
+                throw new CustomerNotSavedInDataBaseErrorException();
+            }
         }
 
     }
 
-
-
-}

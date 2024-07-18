@@ -19,7 +19,7 @@ public class Transaction {
     @Column(name="Operation")
     private String operation;
     @Column(name="Target")
-    private String target;
+    private Integer target;
     @Column(name="Amount")
     private int amount;
 
@@ -33,7 +33,7 @@ public class Transaction {
     public Transaction() {
     }
 
-    public Transaction( String target, String operation, String timeStamp,int amount,Account account) {
+    public Transaction( Integer target, String operation, String timeStamp,int amount,Account account) {
         this.target = target;
         this.operation = operation;
         this.timeStamp = timeStamp;
@@ -50,11 +50,11 @@ public class Transaction {
         this.transactionId = transactionId;
     }
 
-    public String getTarget() {
+    public Integer getTarget() {
         return target;
     }
 
-    public void setTarget(String target) {
+    public void setTarget(Integer target) {
         this.target = target;
     }
 
@@ -80,6 +80,14 @@ public class Transaction {
 
     public void setAmount(int amount) {
         this.amount = amount;
+    }
+
+    public Account getAccount() {
+        return account;
+    }
+
+    public void setAccount(Account account) {
+        this.account = account;
     }
 
     @Override

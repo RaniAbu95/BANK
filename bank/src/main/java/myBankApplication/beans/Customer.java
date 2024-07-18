@@ -1,34 +1,36 @@
 package myBankApplication.beans;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 
 import java.util.List;
 
 @Entity
 @Table(name="customers")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Customer {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int customerId;
-
-
 
     @Column(name="UserName")
     private String username;
     @Column(name="Email")
     private String email;
     @Column(name="Location")
-    private String Location;
+    private String location;
 
 
     @OneToMany(mappedBy = "customer", fetch = FetchType.LAZY)
+    @JsonIgnoreProperties
     private List<Account> accounts;
 
 
 
     public Customer(){};
     public Customer(String location, String username, String email) {
-        Location = location;
+        this.location = location;
         this.username = username;
         this.email = email;
     }
@@ -44,11 +46,11 @@ public class Customer {
 
 
     public String getLocation() {
-        return Location;
+        return location;
     }
 
     public void setLocation(String location) {
-        Location = location;
+        location = location;
     }
 
     public String getEmail() {
@@ -75,14 +77,19 @@ public class Customer {
         this.customerId = customerId;
     }
 
+
+
+
     @Override
     public String toString() {
         return "Customer{" +
                 "customerId=" + customerId +
                 ", username='" + username + '\'' +
                 ", email='" + email + '\'' +
-                ", Location='" + Location + '\'' +
-                //", accounts=" + accounts +
+                ", Location='" + location + '\'' +
+                ", accounts=" + accounts +
                 '}';
     }
+
+
 }

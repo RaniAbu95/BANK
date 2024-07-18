@@ -11,7 +11,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/customers")
-public class Customers {
+public class CustomerController {
 
     @Autowired
     private CustomerBL çustomerBL;
@@ -20,8 +20,7 @@ public class Customers {
 
 
     @PostMapping("add")
-    public String add(String location, String username, String email)throws CustomerEmailErrorException, CustomerLocationErrorException, CustomerIdErrorException, CustomerIsNotExistException
-    {
+    public String add(String location, String username, String email) throws CustomerEmailErrorException, CustomerLocationErrorException, CustomerIdErrorException, CustomerIsNotExistException, CustomerNotSavedInDataBaseErrorException {
         Customer customer = new Customer(location, username, email);
         çustomerBL.addNewCustomer(customer);
         return customer.toString();
@@ -39,19 +38,15 @@ public class Customers {
     }
 
     @PutMapping("updateEmail")
-        public String updateCustomerEmail(@RequestParam int customerId, @RequestParam String newEmail) throws CustomerNotFoundException {
-        Customer customer =this.customerBL.updateCustomerEmail(customerId, newEmail);
-        return customer.toString();
+        public Customer updateCustomerEmail(@RequestParam int customerId, @RequestParam String newEmail) throws CustomerNotFoundException, CustomerNotSavedInDataBaseErrorException {
+        Customer updatedCustomer =this.customerBL.updateCustomerEmail(customerId, newEmail);
+        return updatedCustomer;
     }
 
     @PutMapping("updateLocation")
-    public String updateCustomerLocation(@RequestParam int customerId, @RequestParam String newLocation) throws CustomerNotFoundException, InterruptedException {
-        Customer customer = this.customerBL.updateCustomerLocation(customerId, newLocation);
-        //wait(5);
-        customer =customerBL.getCustomer(customerId);
-        customer =customerBL.getCustomer(customerId);
-        return customer.toString();
-
+    public Customer updateCustomerLocation(@RequestParam int customerId, @RequestParam String newLocation) throws CustomerNotFoundException, CustomerNotSavedInDataBaseErrorException {
+        Customer updatedCustomer =  this.customerBL.updateCustomerLocation(customerId, newLocation);
+        return updatedCustomer;
     }
 
 }

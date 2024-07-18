@@ -2,7 +2,6 @@ package myBankApplication.controllers;
 
 import myBankApplication.BL.AccountBL;
 import myBankApplication.BL.BankerBL;
-import myBankApplication.beans.Account;
 import myBankApplication.beans.Banker;
 import myBankApplication.exceptions.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +13,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/bankers")
-public class Bankers {
+public class BankerController {
         @Autowired
         private AccountBL accountBL;
 
@@ -22,8 +21,7 @@ public class Bankers {
         private BankerBL bankerBL;
 
         @PostMapping("add")
-        public String add(String name, String email) throws BankerEmailErrorException, BankerNameErrorException
-        {
+        public String add(String name, String email) throws BankerEmailErrorException, BankerNameErrorException, BankerNotSavedInDataBaseErrorException {
             Banker banker = new Banker(name, email);
             bankerBL.addNewBanker(banker);
             return banker.toString();

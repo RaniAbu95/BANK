@@ -1,5 +1,7 @@
 package myBankApplication.beans;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -21,51 +23,51 @@ public class Account {
     @Column(name="password")
     private String Password;
 
+    @Column(name="Restriction")
+    private Integer restriction;
+
+    @Column(name="Status")
+    private String status;
+
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "customer_id")
+    @JsonIgnoreProperties("accounts") // Ignore the 'accounts' field in Customer to break the circular reference
     private Customer customer;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "banker_id")
+    @JsonIgnoreProperties({"accounts", "hibernateLazyInitializer", "handler"})
     private Banker banker;
 
 
+
     @OneToMany(mappedBy = "account", fetch = FetchType.LAZY)
+    @JsonIgnore
     private List<Loan> loans;
 
     @OneToMany(mappedBy = "account", fetch = FetchType.LAZY)
+    @JsonIgnore
     private List<Transaction> transactions;
 
 
     @OneToMany(mappedBy = "account", fetch = FetchType.LAZY)
+    @JsonIgnore
     private List<VisaCard> visaCards;
 
 
-    public Account( String category, String password) {
+    public Account(String category, String password) {
+        this.status = "Active";
         this.balance = 0;
         this.category = category;
         this.Password = password;
-
-    }
-
-    @Override
-    public String toString() {
-        return "Account{" +
-                "accountId=" + accountId +
-                ", balance='" + balance + '\'' +
-                ", category='" + category + '\'' +
-                ", Password='" + Password + '\'' +
-                ", customer=" + this.customer +
-//                ", banker=" + banker +
-//                ", loans=" + loans +
-//                ", transactions=" + transactions +
-//                ", visaCards=" + visaCards +
-                '}';
+        setRestrictionAmount(category);
     }
 
     public Account() {
 
     }
+
 
     public String getPassword() {
         return Password;
@@ -140,5 +142,31 @@ public class Account {
         Password = password;
     }
 
+    public Integer getRestriction() {
+        return restriction;
+    }
 
+    public void setRestriction(Integer restriction) {
+        this.restriction = restriction;
+    }
+
+    public void setRestrictionAmount(String category) {
+        if(category=="saving"){
+            setRestriction(-30000);
+        }
+        if(category=="buisness"){
+            setRestriction(-20000);
+        }
+        if(category=="student"){
+            setRestriction(-10000);
+        }
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
 }
