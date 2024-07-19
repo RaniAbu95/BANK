@@ -174,8 +174,9 @@ public class TransactionBL {
 
 
         int accountId = transaction.getAccount().getAccountId();
+        Account account=transaction.getAccount();
         Integer amount =transaction.getAmount();
-        loanBL.loanManagement(amount,accountId);
+        loanBL.loanManagement(amount,account);
 
     }
 

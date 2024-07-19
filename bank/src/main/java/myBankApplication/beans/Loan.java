@@ -34,14 +34,13 @@ public class Loan {
 
 
     public Loan(){}
-    public Loan(String loanType, int amount, int intersetRate) {
-        this.loanType = loanType;
-        this.amount = amount;
+
+    public Loan(Account account, int intersetRate, int amount, String loanType) {
+        this.account = account;
         this.intersetRate = intersetRate;
+        this.amount = amount;
+        this.loanType = loanType;
     }
-
-
-
 
     public int getLoanId() {
         return loanId;
@@ -59,7 +58,7 @@ public class Loan {
         this.loanType = loanType;
     }
 
-    public float getAmount() {
+    public Integer getAmount() {
         return amount;
     }
 
@@ -67,7 +66,7 @@ public class Loan {
         this.amount = amount;
     }
 
-    public float getIntersetRate() {
+    public int getIntersetRate() {
         return intersetRate;
     }
 
@@ -81,5 +80,13 @@ public class Loan {
 
     public int getId() {
         return loanId;
+    }
+
+    public Account getAccount() {
+        return account;
+    }
+
+    public void setAccount(Account account) {
+        this.account = account;
     }
 }
