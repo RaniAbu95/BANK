@@ -1,6 +1,9 @@
 package myBankApplication.BL;
 
+import myBankApplication.beans.Account;
+import myBankApplication.beans.Transaction;
 import myBankApplication.beans.VisaCard;
+import myBankApplication.beans.VisaInstallments;
 import myBankApplication.dao.VisaCardDAO;
 import myBankApplication.exceptions.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,8 +18,10 @@ public class VisaCardBL {
     private VisaCardDAO visaCardDao;
     @Autowired
     private AccountBL accountBL;
+    @Autowired
+    private VisaInstallmentsBL visaInstallmentsBL;
 
-    public VisaCard checkVisaCard(VisaCard visaCard) throws VisaCardAlreadyExistException, VisaCardNumberErrorException, ExpiredDateErrorException, CompanyErrorException, VVCErrorException, LimitErrorException, StatusErrorException {
+    public void checkVisaCard(VisaCard visaCard) throws VisaCardAlreadyExistException, VisaCardNumberErrorException, ExpiredDateErrorException, CompanyErrorException, VVCErrorException, LimitErrorException, StatusErrorException, TransactionNotSavedInDatabase {
 
 
         Optional<VisaCard> existingVisaCard = Optional.ofNullable(this.visaCardDao.findById(visaCard.getVisaCardId()));
@@ -33,28 +38,35 @@ public class VisaCardBL {
         if(visaCard.getCompany()==null){
             throw new CompanyErrorException();
         }
-        if(visaCard.getVvc()==null){
+        if(visaCard.getCvv()==null){
             throw new VVCErrorException();
         }
-        if(visaCard.getCredit()==null){
+        if(visaCard.getLimit()==null){
             throw new LimitErrorException();
         }
         if(visaCard.getStatus()==null){
             throw new StatusErrorException();
         }
+        saveVisaCardInDatebase(visaCard);
 
-        return this.visaCardDao.save(visaCard);
     }
 
+    public boolean saveVisaCardInDatebase(VisaCard visaCard) throws TransactionNotSavedInDatabase {
+        try {
+            this.visaCardDao.save(visaCard);
+            return true;
+        } catch (Exception e) {
+            throw new TransactionNotSavedInDatabase();
+        }
+    }
+    public VisaCard createNewVisaCard(VisaCard visaCard ) throws AccountNotFoundException, VVCErrorException, VisaCardNumberErrorException, LimitErrorException, ExpiredDateErrorException, CompanyErrorException, StatusErrorException, VisaCardAlreadyExistException, TransactionNotSavedInDatabase {
 
-    public VisaCard createNewVisaCard(VisaCard visaCard , int id) throws AccountNotFoundException, VVCErrorException, VisaCardNumberErrorException, LimitErrorException, ExpiredDateErrorException, CompanyErrorException, StatusErrorException, VisaCardAlreadyExistException {
-
-        if(accountBL.getAccount(id) ==null){
+        if(visaCard.getAccount() ==null){
             throw new AccountNotFoundException();
         }
 
 
-        visaCard = checkVisaCard( visaCard);
+        checkVisaCard( visaCard);
         return  visaCard;
     }
 
@@ -64,5 +76,12 @@ public class VisaCardBL {
             return visaCard.get();
         }
         throw new VisaCardNotFoundException();
+    }
+    public Account getVisaCardAccount(int accountId) throws AccountNotFoundException {
+
+        return accountBL.getAccount(accountId);
+    }
+    public void createVisaInstallments(int numberOfInstallments,int valueOfInstallments,int visaCardInstallmentsId) throws VisaInstallmentsNotSavedInDatabase {
+        visaInstallmentsBL.createNewVisaInstallments(numberOfInstallments,valueOfInstallments,visaCardInstallmentsId);
     }
 }

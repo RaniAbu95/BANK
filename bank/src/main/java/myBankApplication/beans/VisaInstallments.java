@@ -1,10 +1,9 @@
 package myBankApplication.beans;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import jakarta.persistence.*;
+@Entity
+@Table(name="Visa_Installments")
 public class VisaInstallments {
 
     @Id
@@ -14,14 +13,21 @@ public class VisaInstallments {
     private int numberOfInstallments;
     @Column(name="value_Of_Installments")
     private int valueOfInstallments;
+    @Column(name="visaCard_Installments_Id")
+    private int visaCardInstallmentsId;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "VisaCard_Id")
+    @JsonIgnoreProperties("Visa_Installments") // Ignore the 'accounts' field in Customer to break the circular reference
+    private VisaCard visaCard;
 
     public VisaInstallments() {
     }
 
-    public VisaInstallments(int installmentsId, int valueOfInstallments, int numberOfInstallments) {
-        InstallmentsId = installmentsId;
-        this.valueOfInstallments = valueOfInstallments;
+    public VisaInstallments(int numberOfInstallments, int valueOfInstallments, int visaCardId) {
         this.numberOfInstallments = numberOfInstallments;
+        this.valueOfInstallments = valueOfInstallments;
+        this.visaCardInstallmentsId = visaCardId;
     }
 
     public int getNumberOfInstallments() {
