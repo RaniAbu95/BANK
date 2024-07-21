@@ -5,8 +5,10 @@ import myBankApplication.BL.CustomerBL;
 import myBankApplication.beans.Customer;
 import myBankApplication.exceptions.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.security.auth.login.AccountNotFoundException;
 import java.util.List;
 
 @RestController
@@ -20,16 +22,20 @@ public class CustomerController {
 
 
     @PostMapping("add")
-    public String add(String location, String username, String email) throws CustomerEmailErrorException, CustomerLocationErrorException, CustomerIdErrorException, CustomerIsNotExistException, CustomerNotSavedInDataBaseErrorException {
-        Customer customer = new Customer(location, username, email);
+    public ResponseEntity<String> add(@RequestParam String location, @RequestParam String username,
+                                      @RequestParam String email, @RequestParam String password) throws CustomerEmailErrorException, CustomerLocationErrorException, CustomerIdErrorException, CustomerIsNotExistException, CustomerNotSavedInDataBaseErrorException, UseerNotSavedInDataBaseErrorException, UserUserNameErrorException, UserPasswordErrorException {
+        Customer customer = new Customer();
+        customer.setUsername(username);
+        customer.setEmail(email);
+        customer.setPassword(password);
+        customer.setLocation(location);
         çustomerBL.addNewCustomer(customer);
-        return customer.toString();
+        return ResponseEntity.ok("Customer added successfully");
     }
 
-    @GetMapping("get/{customerId}")
-    public String getCustomer(@PathVariable int customerId) throws CustomerNotFoundException {
-        Customer customer =customerBL.getCustomer(customerId);
-        return customer.toString();
+    @GetMapping("get")
+    public Customer getCustomer(@RequestParam int customerId) throws CustomerNotFoundException {
+        return customerBL.getCustomer(customerId);
     }
 
     @GetMapping("getAll")
@@ -38,15 +44,23 @@ public class CustomerController {
     }
 
     @PutMapping("updateEmail")
-        public Customer updateCustomerEmail(@RequestParam int customerId, @RequestParam String newEmail) throws CustomerNotFoundException, CustomerNotSavedInDataBaseErrorException {
-        Customer updatedCustomer =this.customerBL.updateCustomerEmail(customerId, newEmail);
-        return updatedCustomer;
+        public ResponseEntity<String> updateCustomerEmail(@RequestParam int customerId, @RequestParam String newEmail) throws CustomerNotFoundException, CustomerNotSavedInDataBaseErrorException {
+        this.customerBL.updateCustomerEmail(customerId, newEmail);
+        return ResponseEntity.ok("Customer e-mail updated successfully");
     }
 
     @PutMapping("updateLocation")
-    public Customer updateCustomerLocation(@RequestParam int customerId, @RequestParam String newLocation) throws CustomerNotFoundException, CustomerNotSavedInDataBaseErrorException {
-        Customer updatedCustomer =  this.customerBL.updateCustomerLocation(customerId, newLocation);
-        return updatedCustomer;
+    public ResponseEntity<String> updateCustomerLocation(@RequestParam int customerId, @RequestParam String newLocation) throws CustomerNotFoundException, CustomerNotSavedInDataBaseErrorException {
+        this.customerBL.updateCustomerLocation(customerId, newLocation);
+        return ResponseEntity.ok("Customer location updated successfully");
     }
+
+
+    @PostMapping("delete")
+    public ResponseEntity<String> delete(@RequestParam int customerId) throws CustomerEmailErrorException, CustomerLocationErrorException, CustomerIdErrorException, CustomerIsNotExistException, CustomerNotSavedInDataBaseErrorException, UseerNotSavedInDataBaseErrorException, UserUserNameErrorException, UserPasswordErrorException, AccountNotSavedInDataBaseErrorException, AccountNotFoundException {
+        çustomerBL.deleteCustomer(customerId);
+        return ResponseEntity.ok("Customer suspended successfully");
+    }
+
 
 }

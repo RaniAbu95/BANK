@@ -22,10 +22,8 @@ public class Account {
     @Getter
     @Column(name="password")
     private String Password;
-
     @Column(name="Restriction")
     private Integer restriction;
-
     @Column(name="Status")
     private String status;
 
@@ -59,9 +57,9 @@ public class Account {
     public Account(String category, String password) {
         this.status = "Active";
         this.balance = 0;
+        this.restriction = 0;
         this.category = category;
         this.Password = password;
-        setRestrictionAmount(category);
     }
 
     public Account() {
@@ -150,17 +148,6 @@ public class Account {
         this.restriction = restriction;
     }
 
-    public void setRestrictionAmount(String category) {
-        if(category=="saving"){
-            setRestriction(-30000);
-        }
-        if(category=="buisness"){
-            setRestriction(-20000);
-        }
-        if(category=="student"){
-            setRestriction(-10000);
-        }
-    }
 
     public String getStatus() {
         return status;

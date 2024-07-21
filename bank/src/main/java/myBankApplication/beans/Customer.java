@@ -16,12 +16,14 @@ public class Customer {
 
     @Column(name="UserName")
     private String username;
+    @Column(name="Password")
+    private String password;
     @Column(name="Email")
     private String email;
     @Column(name="Location")
     private String location;
-
-
+    @Column (name="Status")
+    private String status;
     @OneToMany(mappedBy = "customer", fetch = FetchType.LAZY)
     @JsonIgnoreProperties
     private List<Account> accounts;
@@ -29,12 +31,23 @@ public class Customer {
 
 
     public Customer(){};
-    public Customer(String location, String username, String email) {
+    public Customer(String location, String username, String email, String password) {
         this.location = location;
         this.username = username;
         this.email = email;
+        this.password = password;
+        this.status = "Active";
     }
 
+    public String getStatus() {
+        return status;
+    }
+
+
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
 
     public List<Account> getAccounts() {
         return accounts;
@@ -50,7 +63,7 @@ public class Customer {
     }
 
     public void setLocation(String location) {
-        location = location;
+        this.location = location;
     }
 
     public String getEmail() {
@@ -80,16 +93,11 @@ public class Customer {
 
 
 
-    @Override
-    public String toString() {
-        return "Customer{" +
-                "customerId=" + customerId +
-                ", username='" + username + '\'' +
-                ", email='" + email + '\'' +
-                ", Location='" + location + '\'' +
-                ", accounts=" + accounts +
-                '}';
+    public String getPassword() {
+        return password;
     }
 
-
+    public void setPassword(String password) {
+        this.password = password;
+    }
 }

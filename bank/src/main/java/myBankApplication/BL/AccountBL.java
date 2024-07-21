@@ -28,7 +28,6 @@ public class AccountBL {
     private BankerBL bankerBL;
 
     public void checkAccount(Account account, int customerId) throws AccountsAlreadyExistException,  AccountCategoryErrorException, AccountPasswordErrorException, CustomerNotFoundException {
-
         Optional<Account> existingAccount = this.accountDAO.findById(account.getAccountId());
         if (existingAccount.isPresent()) {
             throw new AccountsAlreadyExistException();
@@ -42,12 +41,12 @@ public class AccountBL {
         if(account.getPassword() == null){
             throw new AccountPasswordErrorException();
         }
-
     }
 
 
     public Account addNewAccount(Account account , int customerId) throws CustomerNotFoundException, AccountsAlreadyExistException,  AccountPasswordErrorException, AccountCategoryErrorException, AccountNotSavedInDataBaseErrorException {
         checkAccount(account,customerId);
+        setRestrictionAmount(account);
         saveAccountInDataBase(account);
         return account;
     }
@@ -101,14 +100,30 @@ public class AccountBL {
     }
 
 
-    public Account updateStatusToSuspend(int accountId) throws AccountNotFoundException, AccountNotSavedInDataBaseErrorException {
+    public Account updateStatusToSuspend(int accountId) throws AccountNotFoundException {
         Optional<Account> account = this.accountDAO.findById(accountId);
         if(account.isPresent()){
             Account accountToUpdate =account.get();
             accountToUpdate.setStatus("Suspend");
             this.accountDAO.save(accountToUpdate);
+
             return accountToUpdate;
         }
         throw new AccountNotFoundException();
     }
+
+
+    public void setRestrictionAmount(Account account) {
+        if(account.getCategory().equals("Saving")){
+            account.setRestriction(-40000);
+        }
+        if(account.getCategory().equals("Buisness")){
+            account.setRestriction(-60000);
+        }
+        if(account.getCategory().equals("Student")){
+            account.setRestriction(-10000);
+        }
+    }
+
+
 }

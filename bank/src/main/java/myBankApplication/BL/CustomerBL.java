@@ -2,12 +2,15 @@ package myBankApplication.BL;
 
 import myBankApplication.beans.Account;
 import myBankApplication.beans.Customer;
+import myBankApplication.beans.User;
+import myBankApplication.dao.AccountDAO;
 import myBankApplication.dao.CustomerDAO;
 
 import myBankApplication.exceptions.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.security.auth.login.AccountNotFoundException;
 import java.util.List;
 import java.util.Optional;
 
@@ -17,6 +20,13 @@ public class CustomerBL {
 
     @Autowired
     private CustomerDAO customerDAO;
+
+    @Autowired
+    private AccountDAO accountDAO;
+
+    @Autowired
+    private UserBL userBL;
+
     public void checkCustomer(Customer customer) throws CustomerIsNotExistException, CustomerEmailErrorException, CustomerIdErrorException, CustomerLocationErrorException {
         Optional<Customer> existingCustomer = this.customerDAO.findById(customer.getCustomerId());
 
@@ -45,9 +55,32 @@ public class CustomerBL {
     }
 
 
-    public void addNewCustomer(Customer customer) throws CustomerEmailErrorException, CustomerLocationErrorException, CustomerIdErrorException, CustomerIsNotExistException, CustomerNotSavedInDataBaseErrorException {
+    public void addNewCustomer(Customer customer) throws CustomerEmailErrorException, CustomerLocationErrorException, CustomerIdErrorException, CustomerIsNotExistException, CustomerNotSavedInDataBaseErrorException, UseerNotSavedInDataBaseErrorException, UserUserNameErrorException, UserPasswordErrorException {
         checkCustomer(customer);
         saveCustomerInDataBase(customer);
+        User user = new User();
+        user.setUserName(customer.getUsername());
+        user.setPassword(customer.getPassword());
+
+        //should add create or add
+
+
+        userBL.addNewUser(user);
+    }
+
+    public void deleteCustomer(int customerId) throws CustomerIsNotExistException, AccountNotSavedInDataBaseErrorException, AccountNotFoundException {
+        Optional<Customer> existingCustomer = this.customerDAO.findById(customerId);
+        if(!existingCustomer.isPresent()){
+            throw new CustomerIsNotExistException();
+        }
+
+        List <Account> accountToSuspend = existingCustomer.get().getAccounts();
+        for(Account account : accountToSuspend){
+            account.setStatus("Suspended");
+            accountDAO.save(account);
+        }
+        existingCustomer.get().setStatus("Suspended");
+        this.customerDAO.save(existingCustomer.get());
     }
 
     public CustomerDAO getCustomerDao() {
