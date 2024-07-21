@@ -19,9 +19,8 @@ public class AccountController {
 
 
     @PostMapping("add")
-    public Account add(int customerId,String category,String password) throws AccountsAlreadyExistException, AccountBalanceErrorException, AccountPasswordErrorException, CustomerNotFoundException, AccountCategoryErrorException, AccountNotFoundException, AccountNotSavedInDataBaseErrorException//Params passed as query string
+    public Account add(@RequestParam int customerId,@RequestParam String  category,@RequestParam String password) throws AccountsAlreadyExistException, AccountBalanceErrorException, AccountPasswordErrorException, CustomerNotFoundException, AccountCategoryErrorException, AccountNotFoundException, AccountNotSavedInDataBaseErrorException//Params passed as query string
     {
-
         Account account = new Account(category, password);
         account.setCustomer(accountBL.getCustomer(customerId));
         Banker banker = accountBL.getBankerBl().getBankerWithMinAccounts();
@@ -50,6 +49,9 @@ public class AccountController {
     public Account updateStatusToSuspend(@PathVariable int accountId) throws AccountNotFoundException, AccountNotSavedInDataBaseErrorException {
         return  accountBL.updateStatusToSuspend(accountId);
     }
+
+
+
 
 
 

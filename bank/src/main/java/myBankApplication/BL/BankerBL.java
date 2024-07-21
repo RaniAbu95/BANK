@@ -1,9 +1,6 @@
 package myBankApplication.BL;
 
-
-import myBankApplication.beans.Account;
 import myBankApplication.beans.Banker;
-import myBankApplication.dao.AccountDAO;
 import myBankApplication.dao.BankerDAO;
 import myBankApplication.exceptions.*;
 import org.springframework.beans.factory.annotation.Autowired;
