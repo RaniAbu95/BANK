@@ -1,8 +1,9 @@
 package myBankApplication.beans;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 
-import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table(name = "visa_cards")
@@ -14,13 +15,13 @@ public class VisaCard {
     @Column(name = "visaCardNumber")
     private long visaCardNumber;
     @Column(name = "expiredDate")
-    private Date expiredDate;
+    private String expiredDate;
     @Column(name = "vvc")
-    private int vvc;
+    private int cvv;
     @Column(name = "company")
     private String company;
     @Column(name = "credit")
-    private int credit;
+    private int limit;
     @Column(name = "Status")
     private String status;
 
@@ -29,29 +30,33 @@ public class VisaCard {
     @JoinColumn(name = "AccountId")
     private Account account;
 
+    @OneToMany(mappedBy = "visaCard", fetch = FetchType.LAZY)
+    @JsonIgnoreProperties
+    private List<VisaInstallments> visaInstallments;
 
 
     public VisaCard(){}
 
-    public VisaCard(String status, int limit, String company, int vvc, Date expiredDate, long visaCardNumber) {
+    public VisaCard(Account account, String status, String company, int cvv, String expiredDate, long visaCardNumber, int limit) {
+        this.account = account;
         this.status = status;
-        this.credit = limit;
         this.company = company;
-        this.vvc = vvc;
+        this.cvv = cvv;
         this.expiredDate = expiredDate;
         this.visaCardNumber = visaCardNumber;
+        this.limit = limit;
     }
 
     public int getVisaCardId() {
         return visaCardId;
     }
 
-    public Integer getCredit() {
-        return credit;
+    public Integer getLimit() {
+        return limit;
     }
 
-    public void setCredit(int limit) {
-        this.credit = limit;
+    public void setLimit(int limit) {
+        this.limit = limit;
     }
 
     public String getCompany() {
@@ -62,19 +67,19 @@ public class VisaCard {
         this.company = company;
     }
 
-    public Integer getVvc() {
-        return vvc;
+    public Integer getCvv() {
+        return cvv;
     }
 
-    public void setVvc(int vvc) {
-        this.vvc = vvc;
+    public void setCvv(int cvv) {
+        this.cvv = cvv;
     }
 
-    public Date getExpiredDate() {
+    public String getExpiredDate() {
         return expiredDate;
     }
 
-    public void setExpiredDate(Date expiredDate) {
+    public void setExpiredDate(String expiredDate) {
         this.expiredDate = expiredDate;
     }
 
@@ -92,5 +97,13 @@ public class VisaCard {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public Account getAccount() {
+        return account;
+    }
+
+    public void setAccount(Account account) {
+        this.account = account;
     }
 }

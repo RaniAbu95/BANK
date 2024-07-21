@@ -59,6 +59,10 @@ public class AccountBL {
         throw new AccountNotFoundException();
     }
 
+    public int getAccountId(Account account) throws AccountNotFoundException {
+        return account.getAccountId();
+    }
+
     public List<Account> getAllAccounts() {
         return this.accountDAO.findAll();
     }
@@ -77,11 +81,12 @@ public class AccountBL {
         }
     }
 
+
     public void updateAccountBalance(int accountId,int newBalance) throws AccountBalanceErrorException, AccountNotFoundException {
         Account accountToUpdate =getAccount(accountId);
-        if(accountToUpdate.getRestriction() > newBalance){
-            throw new AccountBalanceErrorException();
-        }
+//        if(accountToUpdate.getRestriction() > newBalance){
+//            throw new AccountBalanceErrorException();
+//        }
         accountToUpdate.setBalance(newBalance);
         this.accountDAO.save(accountToUpdate);
     }
