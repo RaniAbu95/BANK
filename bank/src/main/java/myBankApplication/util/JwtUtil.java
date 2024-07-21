@@ -3,6 +3,7 @@ package myBankApplication.util;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.SignatureException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import java.util.Date;
@@ -29,9 +30,21 @@ public class JwtUtil {
         final Claims claims = extractAllClaims(token);
         return claimsResolver.apply(claims);
     }
-    private Claims extractAllClaims(String token) {
-        return Jwts.parser().setSigningKey(SECRET_KEY).parseClaimsJws(token).getBody();
+//    private Claims extractAllClaims(String token) {
+//        return Jwts.parser().setSigningKey(SECRET_KEY).parseClaimsJws(token).getBody();
+//    }
+private Claims extractAllClaims(String token) {
+    try {
+        return Jwts.parser()
+                .setSigningKey(SECRET_KEY)
+                .parseClaimsJws(token)
+                .getBody();
+    } catch (SignatureException e) {
+        throw new SignatureException("Invalid JWT signature.");
+    } catch (Exception e) {
+        throw new RuntimeException("Failed to parse JWT token.");
     }
+}
 
     private Boolean isTokenExpired(String token) {
         return extractExpiration(token).before(new Date());

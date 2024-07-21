@@ -11,6 +11,7 @@ import myBankApplication.exceptions.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.security.auth.login.AccountNotFoundException;
@@ -24,7 +25,7 @@ public class VisaCardController {
     private VisaInstallmentsBL VisaInstallments;
 
     @PostMapping("add")
-    public String add(int accountId, String status, String company, int cvv, String expiredDate, long visaCardNumber, int limit) throws AccountsAlreadyExistException, AccountBalanceErrorException, AccountPasswordErrorException, CustomerNotFoundException, AccountCategoryErrorException, AccountNotFoundException, TransactionAlreadyExistException, TransactionTargetNotFoundErrorException, TransactionOperationNotFoundErrorException, TransactionNotSavedInDatabase, TransactionTimestampNotFoundErrorException, TransactionAmountNotFoundErrorException, LoanAlreadyExistException, LoanTypeErrorException, LoanAmountErrorException, businessLoanAmounLessThan10k, VVCErrorException, VisaCardNumberErrorException, LimitErrorException, ExpiredDateErrorException, CompanyErrorException, StatusErrorException, VisaCardAlreadyExistException//Params passed as query string
+    public String add(@RequestParam int accountId, @RequestParam String status, @RequestParam String company, @RequestParam int cvv, @RequestParam String expiredDate, @RequestParam long visaCardNumber,@RequestParam int limit) throws AccountsAlreadyExistException, AccountBalanceErrorException, AccountPasswordErrorException, CustomerNotFoundException, AccountCategoryErrorException, AccountNotFoundException, TransactionAlreadyExistException, TransactionTargetNotFoundErrorException, TransactionOperationNotFoundErrorException, TransactionNotSavedInDatabase, TransactionTimestampNotFoundErrorException, TransactionAmountNotFoundErrorException, LoanAlreadyExistException, LoanTypeErrorException, LoanAmountErrorException, businessLoanAmounLessThan10k, VVCErrorException, VisaCardNumberErrorException, LimitErrorException, ExpiredDateErrorException, CompanyErrorException, StatusErrorException, VisaCardAlreadyExistException//Params passed as query string
     {
         Account account = visaCardBL.getVisaCardAccount(accountId);
         VisaCard visaCard = new VisaCard(account,status,company,cvv,expiredDate,visaCardNumber,limit);

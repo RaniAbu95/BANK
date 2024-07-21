@@ -104,7 +104,10 @@ public class SecurityConfig {
                                 .requestMatchers("/accounts/**").hasRole("ADMIN")
                                 .requestMatchers("/bankers/**").hasRole("ADMIN")
                                 .requestMatchers("/loans/**").hasRole("ADMIN")
-                                .requestMatchers("/visa_cards/**").hasRole("ADMIN")
+                                .requestMatchers("/transactions/**").hasRole("ADMIN")
+                                .requestMatchers("/transactions/**").hasRole("USER")
+                                .requestMatchers("/visaCards/**").hasRole("ADMIN")
+                                .requestMatchers("/visaCards/**").hasRole("USER")
                                 .anyRequest().authenticated() // Secure all other requests
                 )
                 .exceptionHandling(exceptionHandling -> {})
