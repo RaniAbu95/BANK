@@ -23,6 +23,9 @@ public class TransactionBL {
     @Autowired
     private LoanBL loanBL;
 
+    @Autowired
+    private CurrencyExchangeRateBL currencyExchangeRateBL;
+
 
     public Account getTransactionAccount(int accountId) throws AccountNotFoundException {
 
@@ -58,7 +61,7 @@ public class TransactionBL {
         if (transaction.getOperation() == null) {
             throw new TransactionOperationNotFoundErrorException();
         }
-        if (transaction.getAmount() == null) {
+        if (transaction.getAmount() <= 0) {
             throw new TransactionAmountNotFoundErrorException();
         }
         if (transaction.getOperation() == "CashTransfare") {
@@ -95,7 +98,22 @@ public class TransactionBL {
             createLoanTransaction(transaction);
 
         }
-        //if(transaction.getOperation()=="cashDeposit"){}
+        if(transaction.getOperation().equals("DepositForeignCurrency")){
+            double amountInILS = currencyExchangeRateBL.convert(transaction.getForeigCurrencyToExchange(), transaction.getAmount());
+            transaction.setAmount(amountInILS);
+            cashDeposit(transaction);
+        }
+        if(transaction.getOperation().equals("WithDrawlForeignCurrency")){
+            double amountInILS = currencyExchangeRateBL.convert(transaction.getForeigCurrencyToExchange(), transaction.getAmount());
+            transaction.setAmount(amountInILS);
+            cashWithdrawal(transaction);
+        }
+
+
+
+
+
+
         //if(transaction.getOperation()=="cashDeposit"){}
         //if(transaction.getOperation()=="cashDeposit"){}
 
@@ -113,8 +131,8 @@ public class TransactionBL {
     public boolean cashDeposit(Transaction transaction) throws TransactionNotSavedInDatabase {
         try {
             int accountId = accountBL.getAccountId(transaction.getAccount());
-            int accountBalanceFromDatabase = accountBL.getAccountBalance(accountBL.getAccountId(transaction.getAccount()));
-            int newBalance = accountBalanceFromDatabase + transaction.getAmount();
+            double accountBalanceFromDatabase = accountBL.getAccountBalance(accountBL.getAccountId(transaction.getAccount()));
+            double newBalance = accountBalanceFromDatabase + transaction.getAmount();
             accountBL.updateAccountBalance(accountId, newBalance);
             return true;
         } catch (Exception e) {
@@ -126,8 +144,8 @@ public class TransactionBL {
     private boolean cashWithdrawal(Transaction transaction) throws TransactionNotSavedInDatabase {
         try {
             int accountId = accountBL.getAccountId(transaction.getAccount());
-            int accountBalanceFromDatabase = accountBL.getAccountBalance(accountBL.getAccountId(transaction.getAccount()));
-            int newBalance = accountBalanceFromDatabase - transaction.getAmount();
+            double accountBalanceFromDatabase = accountBL.getAccountBalance(accountBL.getAccountId(transaction.getAccount()));
+            double newBalance = accountBalanceFromDatabase - transaction.getAmount();
             accountBL.updateAccountBalance(accountId, newBalance);
             return true;
         } catch (Exception e) {
@@ -142,9 +160,9 @@ public class TransactionBL {
                 Integer targetAccountId = transaction.getTarget();
 
 
-                int accountBalanceFromDatabase = accountBL.getAccountBalance(targetAccountId);
+                double accountBalanceFromDatabase = accountBL.getAccountBalance(targetAccountId);
 
-                int newBalance = accountBalanceFromDatabase + transaction.getAmount();
+                double newBalance = accountBalanceFromDatabase + transaction.getAmount();
                 accountBL.updateAccountBalance(targetAccountId, newBalance);
 
                 return true;
@@ -175,10 +193,12 @@ public class TransactionBL {
 
         int accountId = transaction.getAccount().getAccountId();
         Account account=transaction.getAccount();
-        Integer amount =transaction.getAmount();
+        double amount =transaction.getAmount();
         loanBL.loanManagement(amount,account);
 
     }
+
+
 
 
 }

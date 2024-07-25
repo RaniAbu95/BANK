@@ -21,7 +21,9 @@ public class Transaction {
     @Column(name="Target")
     private Integer target;
     @Column(name="Amount")
-    private int amount;
+    private double amount;
+    @Column (name="foreigCurrencyToExchange")
+    private String foreigCurrencyToExchange;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "account_id")
@@ -39,6 +41,7 @@ public class Transaction {
         this.timeStamp = timeStamp;
         this.amount=amount;
         this.account=account;
+        this.foreigCurrencyToExchange=null;
     }
 
 
@@ -74,11 +77,11 @@ public class Transaction {
         this.timeStamp = timeStamp;
     }
 
-    public Integer getAmount() {
+    public double getAmount() {
         return amount;
     }
 
-    public void setAmount(int amount) {
+    public void setAmount(double amount) {
         this.amount = amount;
     }
 
@@ -99,5 +102,21 @@ public class Transaction {
                 ", target='" + target + '\'' +
                 ", account=" + account +
                 '}';
+    }
+
+    public String getForeigCurrencyToExchange() {
+        return foreigCurrencyToExchange;
+    }
+
+    public void setForeigCurrencyToExchange(String foreigCurrencyToExchange) {
+        this.foreigCurrencyToExchange = foreigCurrencyToExchange;
+    }
+
+    public CurrencyExchangeRate getCurrencyExchangeRate() {
+        return currencyExchangeRate;
+    }
+
+    public void setCurrencyExchangeRate(CurrencyExchangeRate currencyExchangeRate) {
+        this.currencyExchangeRate = currencyExchangeRate;
     }
 }

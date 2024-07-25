@@ -71,7 +71,7 @@ public class AccountBL {
         return this.customerBL.getCustomer(id);
     }
 
-    public int getAccountBalance(int accountId) throws AccountNotFoundException {
+    public double getAccountBalance(int accountId) throws AccountNotFoundException {
         Optional<Account> account = this.accountDAO.findById(accountId);
         if(account.isPresent()){
             return account.get().getBalance();
@@ -82,7 +82,7 @@ public class AccountBL {
     }
 
 
-    public void updateAccountBalance(int accountId,int newBalance) throws AccountBalanceErrorException, AccountNotFoundException {
+    public void updateAccountBalance(int accountId,double newBalance) throws AccountBalanceErrorException, AccountNotFoundException {
         Account accountToUpdate =getAccount(accountId);
 //        if(accountToUpdate.getRestriction() > newBalance){
 //            throw new AccountBalanceErrorException();
