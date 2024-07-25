@@ -35,7 +35,8 @@ public class Account {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "banker_id")
-    @JsonIgnoreProperties({"accounts", "hibernateLazyInitializer", "handler"})
+    //@JsonIgnoreProperties({"accounts", "hibernateLazyInitializer", "handler"})
+    @JsonIgnore
     private Banker banker;
 
 

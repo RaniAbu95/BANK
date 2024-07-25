@@ -1,8 +1,10 @@
 package myBankApplication.beans;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -18,9 +20,8 @@ public class Banker {
     @Column (name="number_of_accounts")
     private int numberOfAccounts;
 
-    //
     @OneToMany(mappedBy = "banker", fetch = FetchType.LAZY)
-    @JsonIgnore
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"}) // To handle lazy loading issues
     private List<Account> accounts;
 
 
@@ -29,6 +30,7 @@ public class Banker {
         this.name = name;
         this.email = email;
         this.numberOfAccounts = 0;
+        this.accounts = new ArrayList<>();
     }
 
     public Banker() {

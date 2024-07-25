@@ -53,7 +53,7 @@ public class CustomerController {
 
 
     @PostMapping("delete")
-    public ResponseEntity<String> delete(@RequestParam int customerId) throws CustomerEmailErrorException, CustomerLocationErrorException, CustomerIdErrorException, CustomerIsNotExistException, CustomerNotSavedInDataBaseErrorException, UseerNotSavedInDataBaseErrorException, UserUserNameErrorException, UserPasswordErrorException, AccountNotSavedInDataBaseErrorException, AccountNotFoundException {
+    public ResponseEntity<String> delete(@RequestParam int customerId) throws CustomerEmailErrorException, CustomerLocationErrorException, CustomerIdErrorException, CustomerIsNotExistException, CustomerNotSavedInDataBaseErrorException, UseerNotSavedInDataBaseErrorException, UserUserNameErrorException, UserPasswordErrorException, AccountNotSavedInDataBaseErrorException, AccountNotFoundException, BankerNotSavedInDataBaseErrorException, BankerNotFoundException {
         çustomerBL.deleteCustomer(customerId);
         return ResponseEntity.ok("Customer suspended successfully");
     }

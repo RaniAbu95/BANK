@@ -41,16 +41,10 @@ public class CacheManager {
 		return map.get(from).get(to);
 	}
 
-	@Scheduled(cron = "0 0 6 * * ?") // https://dzone.com/articles/running-on-time-with-springs-scheduled-tasks
-	//@Scheduled(fixedRate = 60000)
+
+	//@Scheduled(cron = "0 0 6 * * ?") // https://dzone.com/articles/running-on-time-with-springs-scheduled-tasks
+	@Scheduled(fixedRate = 60000)
 	public void removeDaily() {
-
-		System.out.println("Tik-Tok");
-
-		LocalDateTime now = LocalDateTime.now();
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-		System.out.println("Cache cleared at: " + now.format(formatter));
-
 		map.clear();
 	}
 

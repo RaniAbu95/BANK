@@ -1,6 +1,7 @@
 package myBankApplication.BL;
 
 import myBankApplication.beans.Account;
+import myBankApplication.beans.Banker;
 import myBankApplication.beans.Customer;
 import myBankApplication.beans.User;
 import myBankApplication.dao.AccountDAO;
@@ -8,6 +9,7 @@ import myBankApplication.dao.CustomerDAO;
 
 import myBankApplication.exceptions.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import javax.security.auth.login.AccountNotFoundException;
@@ -22,7 +24,10 @@ public class CustomerBL {
     private CustomerDAO customerDAO;
 
     @Autowired
-    private AccountDAO accountDAO;
+    private AccountBL accountBL;
+
+    @Autowired
+    private BankerBL bankerBL;
 
     @Autowired
     private UserBL userBL;
@@ -68,7 +73,7 @@ public class CustomerBL {
         userBL.addNewUser(user);
     }
 
-    public void deleteCustomer(int customerId) throws CustomerIsNotExistException, AccountNotSavedInDataBaseErrorException, AccountNotFoundException {
+    public void deleteCustomer(int customerId) throws CustomerIsNotExistException, AccountNotSavedInDataBaseErrorException, AccountNotFoundException, BankerNotFoundException, BankerNotSavedInDataBaseErrorException {
         Optional<Customer> existingCustomer = this.customerDAO.findById(customerId);
         if(!existingCustomer.isPresent()){
             throw new CustomerIsNotExistException();
@@ -76,8 +81,12 @@ public class CustomerBL {
 
         List <Account> accountToSuspend = existingCustomer.get().getAccounts();
         for(Account account : accountToSuspend){
+
+            //find bankerBy account id
+            Banker responsibleBanker  = bankerBL.getBankerByAccountId(account.getAccountId());
+            bankerBL.decrementBankerAccountsByOne(responsibleBanker.getBankerId());
             account.setStatus("Suspended");
-            accountDAO.save(account);
+            accountBL.saveAccountInDataBase(account);
         }
         existingCustomer.get().setStatus("Suspended");
         this.customerDAO.save(existingCustomer.get());

@@ -1,12 +1,15 @@
 package myBankApplication.BL;
 
 import myBankApplication.beans.Account;
+import myBankApplication.beans.Banker;
 import myBankApplication.beans.Customer;
 import myBankApplication.dao.AccountDAO;
 import myBankApplication.exceptions.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
+
+
 import org.springframework.stereotype.Service;
 
 
@@ -21,6 +24,7 @@ public class AccountBL {
     private AccountDAO accountDAO ;
 
     @Autowired
+    @Lazy
     private CustomerBL customerBL;
 
     @Autowired
@@ -44,9 +48,13 @@ public class AccountBL {
     }
 
 
-    public Account addNewAccount(Account account , int customerId) throws CustomerNotFoundException, AccountsAlreadyExistException,  AccountPasswordErrorException, AccountCategoryErrorException, AccountNotSavedInDataBaseErrorException {
+    public Account addNewAccount(Account account , int customerId) throws CustomerNotFoundException, AccountsAlreadyExistException, AccountPasswordErrorException, AccountCategoryErrorException, AccountNotSavedInDataBaseErrorException, BankerNotSavedInDataBaseErrorException {
+
         checkAccount(account,customerId);
         setRestrictionAmount(account);
+        Banker responsibleBanker = bankerBL.getBankerWithMinAccounts();
+        bankerBL.incrementBankerAccountsByOne(responsibleBanker.getBankerId());
+        responsibleBanker.getAccounts().add(account);
         saveAccountInDataBase(account);
         return account;
     }
