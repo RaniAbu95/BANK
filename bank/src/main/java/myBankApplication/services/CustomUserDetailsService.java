@@ -1,4 +1,4 @@
-package myBankApplication.BL;
+package myBankApplication.services;
 
 import myBankApplication.beans.User;
 import myBankApplication.dao.UserDAO;

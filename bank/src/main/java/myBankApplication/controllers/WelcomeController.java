@@ -1,15 +1,11 @@
 package myBankApplication.controllers;
 
-import myBankApplication.BL.CustomUserDetailsService;
+import myBankApplication.services.CustomUserDetailsService;
 import myBankApplication.BL.UserBL;
-import myBankApplication.beans.AuthRequest;
-import myBankApplication.beans.User;
 import myBankApplication.util.JwtUtil;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 @RestController

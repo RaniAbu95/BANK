@@ -2,7 +2,7 @@
 //
 //import jakarta.servlet.Filter;
 //import myBankApplication.filter.JwtFilter;
-//import myBankApplication.BL.CustomUserDetailsService;
+//import myBankApplication.services.CustomUserDetailsService;
 //import org.springframework.beans.factory.annotation.Autowired;
 //import org.springframework.context.annotation.Bean;
 //import org.springframework.context.annotation.Configuration;
@@ -55,9 +55,8 @@
 
 package myBankApplication.config;
 
-import jakarta.servlet.Filter;
 import myBankApplication.filter.JwtFilter;
-import myBankApplication.BL.CustomUserDetailsService;
+import myBankApplication.services.CustomUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -108,6 +107,8 @@ public class SecurityConfig {
                                 .requestMatchers("/transactions/**").hasRole("USER")
                                 .requestMatchers("/visaCards/**").hasRole("ADMIN")
                                 .requestMatchers("/visaCards/**").hasRole("USER")
+                                .requestMatchers("/money/**").hasRole("ADMIN")
+                                .requestMatchers("/money/**").hasRole("USER")
                                 .anyRequest().authenticated() // Secure all other requests
                 )
                 .exceptionHandling(exceptionHandling -> {})

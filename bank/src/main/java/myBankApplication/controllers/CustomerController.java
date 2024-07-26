@@ -24,11 +24,7 @@ public class CustomerController {
     @PostMapping("add")
     public ResponseEntity<String> add(@RequestParam String location, @RequestParam String username,
                                       @RequestParam String email, @RequestParam String password) throws CustomerEmailErrorException, CustomerLocationErrorException, CustomerIdErrorException, CustomerIsNotExistException, CustomerNotSavedInDataBaseErrorException, UseerNotSavedInDataBaseErrorException, UserUserNameErrorException, UserPasswordErrorException {
-        Customer customer = new Customer();
-        customer.setUsername(username);
-        customer.setEmail(email);
-        customer.setPassword(password);
-        customer.setLocation(location);
+        Customer customer = new Customer(location, username, email, password);
         çustomerBL.addNewCustomer(customer);
         return ResponseEntity.ok("Customer added successfully");
     }
@@ -57,7 +53,7 @@ public class CustomerController {
 
 
     @PostMapping("delete")
-    public ResponseEntity<String> delete(@RequestParam int customerId) throws CustomerEmailErrorException, CustomerLocationErrorException, CustomerIdErrorException, CustomerIsNotExistException, CustomerNotSavedInDataBaseErrorException, UseerNotSavedInDataBaseErrorException, UserUserNameErrorException, UserPasswordErrorException, AccountNotSavedInDataBaseErrorException, AccountNotFoundException {
+    public ResponseEntity<String> delete(@RequestParam int customerId) throws CustomerEmailErrorException, CustomerLocationErrorException, CustomerIdErrorException, CustomerIsNotExistException, CustomerNotSavedInDataBaseErrorException, UseerNotSavedInDataBaseErrorException, UserUserNameErrorException, UserPasswordErrorException, AccountNotSavedInDataBaseErrorException, AccountNotFoundException, BankerNotSavedInDataBaseErrorException, BankerNotFoundException {
         çustomerBL.deleteCustomer(customerId);
         return ResponseEntity.ok("Customer suspended successfully");
     }

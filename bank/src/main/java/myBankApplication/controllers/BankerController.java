@@ -5,6 +5,7 @@ import myBankApplication.BL.BankerBL;
 import myBankApplication.beans.Banker;
 import myBankApplication.exceptions.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.security.auth.login.AccountNotFoundException;
@@ -21,16 +22,16 @@ public class BankerController {
         private BankerBL bankerBL;
 
         @PostMapping("add")
-        public String add(String name, String email) throws BankerEmailErrorException, BankerNameErrorException, BankerNotSavedInDataBaseErrorException {
+        public ResponseEntity<String> add(@RequestParam String name,@RequestParam String email) throws BankerEmailErrorException, BankerNameErrorException, BankerNotSavedInDataBaseErrorException {
             Banker banker = new Banker(name, email);
             bankerBL.addNewBanker(banker);
-            return banker.toString();
+            return ResponseEntity.ok("Banker added successfully");
         }
 
         @GetMapping("get/{bankerId}")
-        public String getBanker(@PathVariable int bankerId) throws AccountNotFoundException {
-            Banker banker = bankerBL.getBanker(bankerId);
-            return banker.toString();
+        public Banker getBanker(@PathVariable int bankerId) throws AccountNotFoundException {
+            return bankerBL.getBanker(bankerId);
+
         }
 
         @GetMapping("getAll")
@@ -39,10 +40,5 @@ public class BankerController {
         }
 
 
-        @PutMapping("update/{bankerId}")
-        public String updateBankerAccounts(@PathVariable int bankerId) throws AccountNotFoundException {
-            Banker newBanker = this.bankerBL.updateBankerAccounts(bankerId);
-            return newBanker.toString();
-        }
     }
 

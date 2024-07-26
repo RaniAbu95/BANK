@@ -16,7 +16,7 @@ public class Account {
     private int accountId;
 
     @Column(name="balance")
-    private int balance;
+    private double balance;
     @Column(name="category")
     private String category;
     @Getter
@@ -35,7 +35,8 @@ public class Account {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "banker_id")
-    @JsonIgnoreProperties({"accounts", "hibernateLazyInitializer", "handler"})
+    //@JsonIgnoreProperties({"accounts", "hibernateLazyInitializer", "handler"})
+    @JsonIgnore
     private Banker banker;
 
 
@@ -120,11 +121,11 @@ public class Account {
         this.accountId = accountId;
     }
 
-    public int getBalance() {
+    public double getBalance() {
         return balance;
     }
 
-    public void setBalance(int balance) {
+    public void setBalance(double balance) {
         this.balance = balance;
     }
 

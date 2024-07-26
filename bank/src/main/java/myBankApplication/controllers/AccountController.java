@@ -19,15 +19,14 @@ public class AccountController {
 
 
     @PostMapping("add")
-    public Account add(@RequestParam int customerId,@RequestParam String  category,@RequestParam String password) throws AccountsAlreadyExistException, AccountBalanceErrorException, AccountPasswordErrorException, CustomerNotFoundException, AccountCategoryErrorException, AccountNotFoundException, AccountNotSavedInDataBaseErrorException//Params passed as query string
+    public Account add(@RequestParam int customerId,@RequestParam String  category,@RequestParam String password) throws AccountsAlreadyExistException, AccountBalanceErrorException, AccountPasswordErrorException, CustomerNotFoundException, AccountCategoryErrorException, AccountNotFoundException, AccountNotSavedInDataBaseErrorException, BankerNotSavedInDataBaseErrorException//Params passed as query string
     {
         Account account = new Account(category, password);
         account.setCustomer(accountBL.getCustomer(customerId));
         Banker banker = accountBL.getBankerBl().getBankerWithMinAccounts();
         account.setBanker(banker);
-        this.accountBL.getBankerBl().updateBankerAccounts(banker.getBankerId());
-        Account newAccount = accountBL.addNewAccount(account,customerId);
-        return newAccount;
+        //this.accountBL.getBankerBl().updateBankerAccounts(banker.getBankerId());
+        return accountBL.addNewAccount(account,customerId);
     }
 
     @GetMapping("get/{accountId}")

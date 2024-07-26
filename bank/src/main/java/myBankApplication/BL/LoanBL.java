@@ -20,7 +20,7 @@ public class LoanBL {
     private AccountBL accountbl;
     private TransactionBL transactionBL;
 
-    public void loanManagement(int loanamount,Account account) throws businessLoanAmounLessThan10k, LoanAlreadyExistException, LoanTypeErrorException, LoanAmountErrorException, AccountNotFoundException {
+    public void loanManagement(double loanamount,Account account) throws businessLoanAmounLessThan10k, LoanAlreadyExistException, LoanTypeErrorException, LoanAmountErrorException, AccountNotFoundException {
 
         if(loanamount>10000)
         {

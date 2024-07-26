@@ -17,7 +17,7 @@ public class Loan {
     private String loanType;
 
     @Column(name="amount")
-    private int amount;
+    private double amount;
 
     @Column(name="interset_rate")
     private int intersetRate;
@@ -35,7 +35,7 @@ public class Loan {
 
     public Loan(){}
 
-    public Loan(Account account, int intersetRate, int amount, String loanType) {
+    public Loan(Account account, int intersetRate, double amount, String loanType) {
         this.account = account;
         this.intersetRate = intersetRate;
         this.amount = amount;
@@ -58,11 +58,11 @@ public class Loan {
         this.loanType = loanType;
     }
 
-    public Integer getAmount() {
+    public double getAmount() {
         return amount;
     }
 
-    public void setAmount(int amount) {
+    public void setAmount(double amount) {
         this.amount = amount;
     }
 

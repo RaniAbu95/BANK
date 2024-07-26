@@ -1,5 +1,6 @@
 package myBankApplication.BL;
 
+import myBankApplication.beans.Account;
 import myBankApplication.beans.Banker;
 import myBankApplication.dao.BankerDAO;
 import myBankApplication.exceptions.*;
@@ -50,9 +51,20 @@ public class BankerBL {
         throw new AccountNotFoundException();
     }
 
-    public Banker updateBankerAccounts(int bankerId){
+    public void incrementBankerAccountsByOne(int bankerId) throws BankerNotSavedInDataBaseErrorException {
         //this.bankerDAO.incrementNumberOfAccounts(bankerId);
-        return this.bankerDAO.findById(bankerId).get();
+        Banker bankerToUpdate = this.bankerDAO.findById(bankerId).get();
+        int newNumberOfAccounts = bankerToUpdate.getNumberOfAccounts()+1;
+        bankerToUpdate.setNumberOfAccounts(newNumberOfAccounts);
+        saveBankerInDataBase(bankerToUpdate);
+    }
+
+    public void decrementBankerAccountsByOne(int bankerId) throws BankerNotSavedInDataBaseErrorException {
+        //this.bankerDAO.incrementNumberOfAccounts(bankerId);
+        Banker bankerToUpdate = this.bankerDAO.findById(bankerId).get();
+        int newNumberOfAccounts = bankerToUpdate.getNumberOfAccounts()-1;
+        bankerToUpdate.setNumberOfAccounts(newNumberOfAccounts);
+        saveBankerInDataBase(bankerToUpdate);
     }
 
     public boolean saveBankerInDataBase(Banker banker) throws  BankerNotSavedInDataBaseErrorException {
@@ -63,6 +75,19 @@ public class BankerBL {
         catch(Exception e){
             throw new BankerNotSavedInDataBaseErrorException();
         }
+    }
+
+    public Banker getBankerByAccountId(int accountId) throws AccountNotFoundException, BankerNotFoundException {
+        List<Banker> allBankers = this.bankerDAO.findAll();
+        for(Banker banker : allBankers){
+            List<Account> accounts = banker.getAccounts();
+            for(Account account : accounts){
+                if(account.getAccountId() == accountId){
+                    return banker;
+                }
+            }
+        }
+        throw new BankerNotFoundException();
     }
 
 
