@@ -35,7 +35,7 @@ public class Transaction {
     public Transaction() {
     }
 
-    public Transaction( Integer target, String operation, String timeStamp,int amount,Account account) {
+    public Transaction( Integer target, String operation, String timeStamp,double amount,Account account) {
         this.target = target;
         this.operation = operation;
         this.timeStamp = timeStamp;

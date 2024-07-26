@@ -30,6 +30,8 @@ public class Customer {
 
 
 
+
+
     public Customer(){};
     public Customer(String location, String username, String email, String password) {
         this.location = location;

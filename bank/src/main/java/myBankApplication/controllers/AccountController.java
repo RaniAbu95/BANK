@@ -29,9 +29,14 @@ public class AccountController {
         return accountBL.addNewAccount(account,customerId);
     }
 
-    @GetMapping("get/{accountId}")
+    @GetMapping("getId/{accountId}")
     public Account getAccount(@PathVariable int accountId) throws AccountNotFoundException {
         return  accountBL.getAccount(accountId);
+    }
+
+    @GetMapping("getBalance/{accountId}")
+    public double getBalance(@PathVariable int accountId) throws AccountNotFoundException {
+        return  accountBL.getAccountBalance(accountId);
     }
 
     @GetMapping("getAll")
@@ -48,13 +53,5 @@ public class AccountController {
     public Account updateStatusToSuspend(@PathVariable int accountId) throws AccountNotFoundException, AccountNotSavedInDataBaseErrorException {
         return  accountBL.updateStatusToSuspend(accountId);
     }
-
-
-
-
-
-
-
-
 
 }

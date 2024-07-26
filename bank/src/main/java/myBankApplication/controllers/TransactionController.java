@@ -47,35 +47,15 @@ public class TransactionController {
         String timeStamp = request.getTimeStamp();
         String foreignCurrency = request.getForeigCurrencyToExchange();
         int amount = request.getAmount();
-//        Transaction transaction = new Transaction();
-//        transaction.setTarget(target);
-//        transaction.setOperation(operation);
-//        transaction.setTimeStamp(timeStamp);
-//        transaction.setAmount(amount);
-//        transaction.setForeigCurrencyToExchange(foreignCurrency);
-//        transaction.setAccount(account);
         transactionBL.createNewTransaction(target, operation, timeStamp ,amount, accountId,foreignCurrency);
-
-
 
         return ResponseEntity.ok("Transaction completed successfully");
 
         // Your business logic here
     }
 
-//    @PostMapping("deposit/foreignCurrency")
-//    public String add(@RequestParam String from,@RequestParam double amount,@RequestParam int AccountId) throws AccountsAlreadyExistException, AccountBalanceErrorException, AccountPasswordErrorException, CustomerNotFoundException, AccountCategoryErrorException, AccountNotFoundException, TransactionAlreadyExistException, TransactionTargetNotFoundErrorException, TransactionOperationNotFoundErrorException, TransactionNotSavedInDatabase, TransactionTimestampNotFoundErrorException, TransactionAmountNotFoundErrorException, LoanAlreadyExistException, LoanTypeErrorException, LoanAmountErrorException, businessLoanAmounLessThan10k//Params passed as query string
-//    {
-//
-//    }
-//    @PostMapping("withdraw/foreignCurrency")
-//    public String add(@RequestParam String from,@RequestParam double amount,@RequestParam int AccountId) throws AccountsAlreadyExistException, AccountBalanceErrorException, AccountPasswordErrorException, CustomerNotFoundException, AccountCategoryErrorException, AccountNotFoundException, TransactionAlreadyExistException, TransactionTargetNotFoundErrorException, TransactionOperationNotFoundErrorException, TransactionNotSavedInDatabase, TransactionTimestampNotFoundErrorException, TransactionAmountNotFoundErrorException, LoanAlreadyExistException, LoanTypeErrorException, LoanAmountErrorException, businessLoanAmounLessThan10k//Params passed as query string
-//    {
-//        Account account = transactionBL.getTransactionAccount(accountId);
-//        Transaction transaction = new Transaction(target,operation,timeStamp,amount,account);
-//        transactionBL.createNewTransaction(transaction);
-//
-//        return transaction.toString();
-//    }
+
+
+
 
 }

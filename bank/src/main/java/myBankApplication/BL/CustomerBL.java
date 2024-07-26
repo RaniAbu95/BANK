@@ -1,16 +1,14 @@
 package myBankApplication.BL;
 
-import myBankApplication.EmailService;
+import myBankApplication.services.EmailService;
 import myBankApplication.beans.Account;
 import myBankApplication.beans.Banker;
 import myBankApplication.beans.Customer;
 import myBankApplication.beans.User;
-import myBankApplication.dao.AccountDAO;
 import myBankApplication.dao.CustomerDAO;
 
 import myBankApplication.exceptions.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import javax.security.auth.login.AccountNotFoundException;

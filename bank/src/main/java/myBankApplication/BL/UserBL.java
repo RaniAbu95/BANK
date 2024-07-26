@@ -41,8 +41,14 @@ public class UserBL {
 
     public User addNewUser(User user) throws UseerNotSavedInDataBaseErrorException, UserUserNameErrorException, UserPasswordErrorException {
         checkUser(user);
+
+        //add your email function here - check code before add to the DB
+
         //createUser(user.getUserName(), user.getPassword(),user.ge )
         saveUserInDataBase(user);
+
+
+
         return user;
     }
 

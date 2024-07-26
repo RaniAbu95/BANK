@@ -1,8 +1,6 @@
 package myBankApplication.BL;
 
-import myBankApplication.beans.Account;
-import myBankApplication.beans.Banker;
-import myBankApplication.beans.Customer;
+import myBankApplication.beans.*;
 import myBankApplication.dao.AccountDAO;
 import myBankApplication.exceptions.*;
 
@@ -25,11 +23,23 @@ public class AccountBL {
 
     @Autowired
     @Lazy
+    private TransactionBL transactionBL ;
+
+    @Autowired
+    @Lazy
     private CustomerBL customerBL;
 
     @Autowired
     @Lazy
+    private VisaInstallmentsBL visaInstallmentsBL ;
+
+    @Autowired
+    @Lazy
     private BankerBL bankerBL;
+
+    @Autowired
+    @Lazy
+    private LoanBL loanBL;
 
     public void checkAccount(Account account, int customerId) throws AccountsAlreadyExistException,  AccountCategoryErrorException, AccountPasswordErrorException, CustomerNotFoundException {
         Optional<Account> existingAccount = this.accountDAO.findById(account.getAccountId());
@@ -137,6 +147,29 @@ public class AccountBL {
             account.setRestriction(-10000);
         }
     }
+
+    public void addNewPayment(String paymentType, String timeStamp , double amount, int accountId, VisaInstallments visaInstallments ,Loan loan) throws TransactionAlreadyExistException, TransactionTargetNotFoundErrorException, LoanAlreadyExistException, TransactionOperationNotFoundErrorException, LoanTypeErrorException, TransactionNotSavedInDatabase, AccountBalanceErrorException, LoanAmountErrorException, TransactionAmountNotFoundErrorException, businessLoanAmounLessThan10k, AccountNotFoundException, TransactionTimestampNotFoundErrorException, VisaInstallmentsNotSavedInDatabase {
+
+        if(paymentType.equals("VisaInstallment")) {
+            transactionBL.createNewTransaction(null, "cashWithdrawal", timeStamp, amount,  accountId, "null");
+            visaInstallments.setNumberOfPayments(visaInstallments.getNumberOfPayments() + 1);
+            if(visaInstallments.getNumberOfInstallments()-visaInstallments.getNumberOfPayments()==0 ) {
+                visaInstallments.setInstalmentCompleted(Boolean.TRUE);
+            }
+            visaInstallmentsBL.saveVisaInstallmentsInDatebase(visaInstallments);
+        }
+
+        else if(paymentType.equals("LoanInstallment")){
+            Transaction transaction =  transactionBL.createNewTransaction(null, "cashWithdrawal", timeStamp, amount,  accountId, "null");
+            loan.setCompletedPayments(loan.getCompletedPayments() + 1);
+            loanBL.saveLoanInDataBase(loan);
+            double accountBalance = loan.getAccount().getBalance();
+            updateAccountBalance(accountId, accountBalance - transaction.getAmount());
+        }
+
+    }
+
+
 
 
 }
