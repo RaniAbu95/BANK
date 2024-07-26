@@ -1,5 +1,6 @@
 package myBankApplication.BL;
 
+import myBankApplication.EmailService;
 import myBankApplication.beans.Account;
 import myBankApplication.beans.Banker;
 import myBankApplication.beans.Customer;
@@ -32,6 +33,10 @@ public class CustomerBL {
     @Autowired
     private UserBL userBL;
 
+
+    @Autowired
+    private EmailService emailService;
+
     public void checkCustomer(Customer customer) throws CustomerIsNotExistException, CustomerEmailErrorException, CustomerIdErrorException, CustomerLocationErrorException {
         Optional<Customer> existingCustomer = this.customerDAO.findById(customer.getCustomerId());
 
@@ -48,6 +53,8 @@ public class CustomerBL {
         if(customer.getCustomerId() == null){
             throw new CustomerIdErrorException();
         }
+
+            emailService.sendAccountEmail("baselasli2@gmail.com", "Welcome", "Thank you for creating an account with us.");
 
     }
 

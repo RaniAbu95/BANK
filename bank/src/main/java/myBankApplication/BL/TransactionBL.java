@@ -1,5 +1,6 @@
 package myBankApplication.BL;
 
+//import myBankApplication.EmailService;
 import myBankApplication.beans.Account;
 import myBankApplication.beans.Loan;
 import myBankApplication.beans.Transaction;
@@ -25,6 +26,7 @@ public class TransactionBL {
 
     @Autowired
     private CurrencyExchangeRateBL currencyExchangeRateBL;
+
 
 
     public Account getTransactionAccount(int accountId) throws AccountNotFoundException {
@@ -138,6 +140,8 @@ public class TransactionBL {
             double accountBalanceFromDatabase = accountBL.getAccountBalance(accountBL.getAccountId(transaction.getAccount()));
             double newBalance = accountBalanceFromDatabase + transaction.getAmount();
             accountBL.updateAccountBalance(accountId, newBalance);
+
+
             return true;
         } catch (Exception e) {
             throw new TransactionNotSavedInDatabase();
