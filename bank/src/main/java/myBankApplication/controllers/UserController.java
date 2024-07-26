@@ -38,6 +38,9 @@ public class UserController {
     public ResponseEntity<String> createUser(@RequestBody User user) throws Exception {
         userBl.addNewUser(user);
         return ResponseEntity.ok("User registered successfully");
+
+
+
         //return user;
     }
 

@@ -1,4 +1,4 @@
-package myBankApplication;
+package myBankApplication.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;

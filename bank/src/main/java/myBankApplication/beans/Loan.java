@@ -20,26 +20,27 @@ public class Loan {
     private double amount;
 
     @Column(name="interset_rate")
-    private int intersetRate;
+    private Integer intersetRate;
+
+
+    @Column(name="completedPayments")
+    private int completedPayments;
+
+    @Column(name="numberOfPayments")
+    private int numberOfPayments;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "account_id")
     private Account account;
 
-    //to be removed
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "customer_id")
-    private Customer customer;
-
-
 
     public Loan(){}
 
-    public Loan(Account account, int intersetRate, double amount, String loanType) {
+    public Loan(Account account, double amount) {
         this.account = account;
-        this.intersetRate = intersetRate;
         this.amount = amount;
-        this.loanType = loanType;
+        this.completedPayments = 0;
+        this.intersetRate = null;
     }
 
     public int getLoanId() {
@@ -66,11 +67,11 @@ public class Loan {
         this.amount = amount;
     }
 
-    public int getIntersetRate() {
+    public Integer getIntersetRate() {
         return intersetRate;
     }
 
-    public void setIntersetRate(int intersetRate) {
+    public void setIntersetRate(Integer intersetRate) {
         this.intersetRate = intersetRate;
     }
 
@@ -89,4 +90,22 @@ public class Loan {
     public void setAccount(Account account) {
         this.account = account;
     }
+
+    public int getCompletedPayments() {
+        return completedPayments;
+    }
+
+    public void setCompletedPayments(int completedPayments) {
+        this.completedPayments = completedPayments;
+    }
+
+    public int getNumberOfPayments() {
+        return numberOfPayments;
+    }
+
+    public void setNumberOfPayments(int numberOfPayments) {
+        this.numberOfPayments = numberOfPayments;
+    }
+
+
 }

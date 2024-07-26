@@ -1,6 +1,6 @@
 package myBankApplication.BL;
 
-//import myBankApplication.EmailService;
+//import myBankApplication.services.EmailService;
 import myBankApplication.beans.Account;
 import myBankApplication.beans.Loan;
 import myBankApplication.beans.Transaction;
@@ -17,7 +17,6 @@ public class TransactionBL {
 
     @Autowired
     private TransactionDAO transactionDao;
-
 
     @Autowired
     private AccountBL accountBL;
@@ -43,7 +42,7 @@ public class TransactionBL {
     }
 
 
-    public Transaction createNewTransaction(Integer target, String operation, String timeStamp ,int amount, int accountId,String foreignCurrency) throws AccountNotFoundException, TransactionAlreadyExistException, TransactionTargetNotFoundErrorException, TransactionOperationNotFoundErrorException, TransactionTimestampNotFoundErrorException, TransactionNotSavedInDatabase, TransactionAmountNotFoundErrorException, AccountBalanceErrorException, LoanAlreadyExistException, LoanTypeErrorException, LoanAmountErrorException, businessLoanAmounLessThan10k {
+    public Transaction createNewTransaction(Integer target, String operation, String timeStamp ,double amount, int accountId,String foreignCurrency) throws AccountNotFoundException, TransactionAlreadyExistException, TransactionTargetNotFoundErrorException, TransactionOperationNotFoundErrorException, TransactionTimestampNotFoundErrorException, TransactionNotSavedInDatabase, TransactionAmountNotFoundErrorException, AccountBalanceErrorException, LoanAlreadyExistException, LoanTypeErrorException, LoanAmountErrorException, businessLoanAmounLessThan10k {
 
         Account account = getTransactionAccount(accountId);
         Transaction transaction = new Transaction(target,operation,timeStamp,amount,account);
@@ -200,9 +199,8 @@ public class TransactionBL {
 
 
         int accountId = transaction.getAccount().getAccountId();
-        Account account=transaction.getAccount();
         double amount =transaction.getAmount();
-        loanBL.loanManagement(amount,account);
+        loanBL.createNewLoan(amount,accountId);
 
     }
 

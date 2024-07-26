@@ -1,10 +1,7 @@
 package myBankApplication.BL;
 
-import myBankApplication.beans.Transaction;
 import myBankApplication.beans.VisaCard;
 import myBankApplication.beans.VisaInstallments;
-import myBankApplication.dao.AccountDAO;
-import myBankApplication.dao.TransactionDAO;
 import myBankApplication.dao.VisaCardDAO;
 import myBankApplication.dao.VisaInstallmentsDAO;
 import myBankApplication.exceptions.*;
@@ -15,7 +12,6 @@ import org.springframework.stereotype.Service;
 import javax.security.auth.login.AccountNotFoundException;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 
@@ -53,25 +49,25 @@ public class VisaInstallmentsBL {
         }
     }
 
-    @Scheduled(fixedRate = 30000)
-    public void paymentOfInstallments() throws AccountNotFoundException, TransactionAlreadyExistException, TransactionTargetNotFoundErrorException, LoanAlreadyExistException, TransactionOperationNotFoundErrorException, LoanTypeErrorException, TransactionNotSavedInDatabase, AccountBalanceErrorException, LoanAmountErrorException, TransactionAmountNotFoundErrorException, businessLoanAmounLessThan10k, TransactionTimestampNotFoundErrorException, VisaInstallmentsNotSavedInDatabase {
+    //@Scheduled(fixedRate = 30000)
+    public void visaInstallmentsPayment() throws AccountNotFoundException, TransactionAlreadyExistException, TransactionTargetNotFoundErrorException, LoanAlreadyExistException, TransactionOperationNotFoundErrorException, LoanTypeErrorException, TransactionNotSavedInDatabase, AccountBalanceErrorException, LoanAmountErrorException, TransactionAmountNotFoundErrorException, businessLoanAmounLessThan10k, TransactionTimestampNotFoundErrorException, VisaInstallmentsNotSavedInDatabase {
         LocalDateTime currentDateTime = LocalDateTime.now();
         System.out.println("paymentOfInstallments is called");
-        List<VisaCard> visaCards = this.visaCardDAO.findAll();
+        List<VisaCard> visaCards = this.visaCardDAO.findAll(); //change this to visaCardBL.getAllVisaCards()
         for(VisaCard visaCard : visaCards ){
             int visaCardId = visaCard.getVisaCardId();
             List<VisaInstallments> installmentsList = visaInstallmentsDAO.findAllByVisaCardInstallmentsId(visaCardId);
             for (VisaInstallments visaInstallments : installmentsList) {
                 if(Boolean.FALSE.equals(visaInstallments.isInstalmentCompleted())){
                     //transactionBL.createNewTransaction(null, "cashWithdrawal", currentDateTime.toString() ,visaInstallments.getValueOfInstallments(), visaCard.getAccount().getAccountId(),"null");
-                    addNewPayment(null,  "cashWithdrawal",  currentDateTime.toString() ,visaInstallments.getValueOfInstallments(),  visaCard.getAccount().getAccountId(), "null", visaInstallments,visaCard);
+                    addNewVisaPayment(null,  "cashWithdrawal",  currentDateTime.toString() ,visaInstallments.getValueOfInstallments(),  visaCard.getAccount().getAccountId(), "null", visaInstallments,visaCard);
                 }
                 //transactionBL.createNewTransaction(null, "cashWithdrawal", currentDateTime.toString() ,visaInstallments.getValueOfInstallments(), visaCard.getAccount().getAccountId(),"null");
             }
         }
     }
 
-    public void addNewPayment(Integer target, String operation, String timeStamp ,int amount, int accountId,String foreignCurrency,VisaInstallments visaInstallments,VisaCard visaCard) throws TransactionAlreadyExistException, TransactionTargetNotFoundErrorException, LoanAlreadyExistException, TransactionOperationNotFoundErrorException, LoanTypeErrorException, TransactionNotSavedInDatabase, AccountBalanceErrorException, LoanAmountErrorException, TransactionAmountNotFoundErrorException, businessLoanAmounLessThan10k, AccountNotFoundException, TransactionTimestampNotFoundErrorException, VisaInstallmentsNotSavedInDatabase {
+    public void addNewVisaPayment(Integer target, String operation, String timeStamp , int amount, int accountId, String foreignCurrency, VisaInstallments visaInstallments, VisaCard visaCard) throws TransactionAlreadyExistException, TransactionTargetNotFoundErrorException, LoanAlreadyExistException, TransactionOperationNotFoundErrorException, LoanTypeErrorException, TransactionNotSavedInDatabase, AccountBalanceErrorException, LoanAmountErrorException, TransactionAmountNotFoundErrorException, businessLoanAmounLessThan10k, AccountNotFoundException, TransactionTimestampNotFoundErrorException, VisaInstallmentsNotSavedInDatabase {
 
         if(visaInstallments.getNumberOfInstallments()> visaInstallments.getNumberOfPayments()){
             transactionBL.createNewTransaction(null, "cashWithdrawal", timeStamp.toString() ,visaInstallments.getValueOfInstallments(), visaCard.getAccount().getAccountId(),"null");
