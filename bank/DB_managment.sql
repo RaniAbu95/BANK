@@ -10,10 +10,16 @@ select * from bankers;
 
 select * from users;
 
+select * from visa_cards;
+
+select * from visa_installments;
+
+select * from transactions;
+
 
 
 INSERT INTO users (id, user_name, password, role) 
-VALUES (1, 'Admin', 'kydew1-setbot-myJxux', 'ROLE_ADMIN');
+VALUES (2, 'basel', 'toto8923toto', 'ROLE_USER');
 
 
 commit;
@@ -37,7 +43,7 @@ drop table customers;
 
 drop table users;
 
-
+drop table visa_installments;
 
 
 

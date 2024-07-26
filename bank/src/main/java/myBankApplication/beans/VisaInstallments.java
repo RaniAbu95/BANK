@@ -15,11 +15,18 @@ public class VisaInstallments {
     private int valueOfInstallments;
     @Column(name="visaCard_Installments_Id")
     private int visaCardInstallmentsId;
+    @Column(name="numberOfPayments")
+    private Integer numberOfPayments;
+    @Column(name="instalmentCompleted")
+    private Boolean instalmentCompleted;
 
+
+    // Define the relationship with VisaCard
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "VisaCard_Id")
-    @JsonIgnoreProperties("Visa_Installments") // Ignore the 'accounts' field in Customer to break the circular reference
+    @JoinColumn(name = "visaCard_Installments_Id", referencedColumnName = "visaCardId", insertable = false, updatable = false)
+    @JsonIgnoreProperties("visaInstallments")
     private VisaCard visaCard;
+
 
     public VisaInstallments() {
     }
@@ -28,6 +35,8 @@ public class VisaInstallments {
         this.numberOfInstallments = numberOfInstallments;
         this.valueOfInstallments = valueOfInstallments;
         this.visaCardInstallmentsId = visaCardId;
+        this.numberOfPayments = 0;
+        this.instalmentCompleted = Boolean.FALSE;
     }
 
     public int getNumberOfInstallments() {
@@ -52,5 +61,37 @@ public class VisaInstallments {
 
     public void setInstallmentsId(int installmentsId) {
         InstallmentsId = installmentsId;
+    }
+
+    public int getVisaCardInstallmentsId() {
+        return visaCardInstallmentsId;
+    }
+
+    public void setVisaCardInstallmentsId(int visaCardInstallmentsId) {
+        this.visaCardInstallmentsId = visaCardInstallmentsId;
+    }
+
+    public int getNumberOfPayments() {
+        return numberOfPayments;
+    }
+
+    public void setNumberOfPayments(int numberOfPayments) {
+        this.numberOfPayments = numberOfPayments;
+    }
+
+    public VisaCard getVisaCard() {
+        return visaCard;
+    }
+
+    public void setVisaCard(VisaCard visaCard) {
+        this.visaCard = visaCard;
+    }
+
+    public Boolean isInstalmentCompleted() {
+        return instalmentCompleted;
+    }
+
+    public void setInstalmentCompleted(boolean instalmentCompleted) {
+        this.instalmentCompleted = instalmentCompleted;
     }
 }

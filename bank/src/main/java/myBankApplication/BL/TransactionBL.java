@@ -41,8 +41,12 @@ public class TransactionBL {
     }
 
 
-    public Transaction createNewTransaction(Transaction transaction) throws AccountNotFoundException, TransactionAlreadyExistException, TransactionTargetNotFoundErrorException, TransactionOperationNotFoundErrorException, TransactionTimestampNotFoundErrorException, TransactionNotSavedInDatabase, TransactionAmountNotFoundErrorException, AccountBalanceErrorException, LoanAlreadyExistException, LoanTypeErrorException, LoanAmountErrorException, businessLoanAmounLessThan10k {
+    public Transaction createNewTransaction(Integer target, String operation, String timeStamp ,int amount, int accountId,String foreignCurrency) throws AccountNotFoundException, TransactionAlreadyExistException, TransactionTargetNotFoundErrorException, TransactionOperationNotFoundErrorException, TransactionTimestampNotFoundErrorException, TransactionNotSavedInDatabase, TransactionAmountNotFoundErrorException, AccountBalanceErrorException, LoanAlreadyExistException, LoanTypeErrorException, LoanAmountErrorException, businessLoanAmounLessThan10k {
 
+        Account account = getTransactionAccount(accountId);
+        Transaction transaction = new Transaction(target,operation,timeStamp,amount,account);
+        transaction.setForeigCurrencyToExchange(foreignCurrency);
+        transaction.setAccount(account);
         checkTransaction(transaction);
         return transaction;
     }

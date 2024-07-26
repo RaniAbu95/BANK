@@ -42,8 +42,8 @@ public class CacheManager {
 	}
 
 
-	//@Scheduled(cron = "0 0 6 * * ?") // https://dzone.com/articles/running-on-time-with-springs-scheduled-tasks
-	@Scheduled(fixedRate = 60000)
+	@Scheduled(cron = "0 0 6 * * ?") // https://dzone.com/articles/running-on-time-with-springs-scheduled-tasks
+	//@Scheduled(fixedRate = 60000)
 	public void removeDaily() {
 		map.clear();
 	}

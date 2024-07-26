@@ -47,14 +47,17 @@ public class TransactionController {
         String timeStamp = request.getTimeStamp();
         String foreignCurrency = request.getForeigCurrencyToExchange();
         int amount = request.getAmount();
-        Transaction transaction = new Transaction();
-        transaction.setTarget(target);
-        transaction.setOperation(operation);
-        transaction.setTimeStamp(timeStamp);
-        transaction.setAmount(amount);
-        transaction.setForeigCurrencyToExchange(foreignCurrency);
-        transaction.setAccount(account);
-        transactionBL.createNewTransaction(transaction);
+//        Transaction transaction = new Transaction();
+//        transaction.setTarget(target);
+//        transaction.setOperation(operation);
+//        transaction.setTimeStamp(timeStamp);
+//        transaction.setAmount(amount);
+//        transaction.setForeigCurrencyToExchange(foreignCurrency);
+//        transaction.setAccount(account);
+        transactionBL.createNewTransaction(target, operation, timeStamp ,amount, accountId,foreignCurrency);
+
+
+
         return ResponseEntity.ok("Transaction completed successfully");
 
         // Your business logic here

@@ -30,9 +30,11 @@ public class VisaCard {
     @JoinColumn(name = "AccountId")
     private Account account;
 
-    @OneToMany(mappedBy = "visaCard", fetch = FetchType.LAZY)
-    @JsonIgnoreProperties
+    @OneToMany(mappedBy = "visaCard", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnoreProperties("visaCard")
     private List<VisaInstallments> visaInstallments;
+
+
 
 
     public VisaCard(){}
