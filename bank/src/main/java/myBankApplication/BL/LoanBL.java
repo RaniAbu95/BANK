@@ -89,8 +89,13 @@ public class LoanBL {
         }
     }
 
+    public List<Loan> getAllLoans(int accountId) throws AccountNotFoundException {
+        Account account = accountBl.getAccount(accountId);
+        return this.loanDAO.findAllByAccount(account);
+    }
 
-    @Scheduled(fixedRate = 60000)
+    @Scheduled(cron = "0 0 12 15 * ?")
+    //@Scheduled(fixedRate = 60000)
     public void loanPayment() throws TransactionAlreadyExistException, LoanTypeErrorException, TransactionAmountNotFoundErrorException, VisaInstallmentsNotSavedInDatabase, TransactionTargetNotFoundErrorException, LoanAlreadyExistException, TransactionOperationNotFoundErrorException, TransactionNotSavedInDatabase, AccountBalanceErrorException, LoanAmountErrorException, businessLoanAmounLessThan10k, AccountNotFoundException, TransactionTimestampNotFoundErrorException {
         LocalDateTime currentDateTime = LocalDateTime.now();
         System.out.println("paymentOfInstallments is called");

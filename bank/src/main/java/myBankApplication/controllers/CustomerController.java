@@ -4,6 +4,7 @@ package myBankApplication.controllers;
 import myBankApplication.BL.CustomerBL;
 import myBankApplication.beans.Customer;
 import myBankApplication.exceptions.*;
+import myBankApplication.services.EmailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,12 +21,16 @@ public class CustomerController {
     @Autowired
     private CustomerBL customerBL;
 
+    @Autowired
+    private EmailService emailService;
+
 
     @PostMapping("add")
     public ResponseEntity<String> add(@RequestParam String location, @RequestParam String username,
                                       @RequestParam String email, @RequestParam String password) throws CustomerEmailErrorException, CustomerLocationErrorException, CustomerIdErrorException, CustomerIsNotExistException, CustomerNotSavedInDataBaseErrorException, UseerNotSavedInDataBaseErrorException, UserUserNameErrorException, UserPasswordErrorException {
         Customer customer = new Customer(location, username, email, password);
         çustomerBL.addNewCustomer(customer);
+        emailService.sendVerificationEmail(email);
         return ResponseEntity.ok("Customer added successfully");
     }
 
@@ -58,5 +63,15 @@ public class CustomerController {
         return ResponseEntity.ok("Customer suspended successfully");
     }
 
+
+    @PostMapping("verify")
+    public ResponseEntity<String> verify(@RequestParam String email, @RequestParam String code, @RequestParam int customerId) throws CustomerNotSavedInDataBaseErrorException, CustomerNotFoundException {
+        if (emailService.verifyCode(email, code)) {
+            customerBL.emailVerfiyed(customerId);
+            return ResponseEntity.ok("Email verified successfully.");
+        } else {
+            return ResponseEntity.status(400).body("Verification failed. Invalid code.");
+        }
+    }
 
 }

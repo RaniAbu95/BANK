@@ -157,4 +157,9 @@ public class Account {
     public void setStatus(String status) {
         this.status = status;
     }
+
+    public int getCustomerId() {
+        return customer.getCustomerId();
+    }
+
 }

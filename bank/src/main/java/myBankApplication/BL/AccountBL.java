@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 
 import javax.security.auth.login.AccountNotFoundException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -41,7 +42,7 @@ public class AccountBL {
     @Lazy
     private LoanBL loanBL;
 
-    public void checkAccount(Account account, int customerId) throws AccountsAlreadyExistException,  AccountCategoryErrorException, AccountPasswordErrorException, CustomerNotFoundException {
+    public void checkAccount(Account account, int customerId) throws AccountsAlreadyExistException, AccountCategoryErrorException, AccountPasswordErrorException, CustomerNotFoundException, CustomerEmailUnVerfiyedErrorException {
         Optional<Account> existingAccount = this.accountDAO.findById(account.getAccountId());
         if (existingAccount.isPresent()) {
             throw new AccountsAlreadyExistException();
@@ -55,16 +56,21 @@ public class AccountBL {
         if(account.getPassword() == null){
             throw new AccountPasswordErrorException();
         }
+        if(!customerBL.getCustomer(customerId).getEmailVerify().equals("EmailVerfiyed")){
+            throw new CustomerEmailUnVerfiyedErrorException();
+        }
     }
 
 
-    public Account addNewAccount(Account account , int customerId) throws CustomerNotFoundException, AccountsAlreadyExistException, AccountPasswordErrorException, AccountCategoryErrorException, AccountNotSavedInDataBaseErrorException, BankerNotSavedInDataBaseErrorException {
+    public Account addNewAccount(Account account , int customerId) throws CustomerNotFoundException, AccountsAlreadyExistException, AccountPasswordErrorException, AccountCategoryErrorException, AccountNotSavedInDataBaseErrorException, BankerNotSavedInDataBaseErrorException, CustomerEmailUnVerfiyedErrorException {
 
         checkAccount(account,customerId);
         setRestrictionAmount(account);
         Banker responsibleBanker = bankerBL.getBankerWithMinAccounts();
         bankerBL.incrementBankerAccountsByOne(responsibleBanker.getBankerId());
         responsibleBanker.getAccounts().add(account);
+        Customer customer = customerBL.getCustomer(customerId);
+        account.setCustomer(customer);
         saveAccountInDataBase(account);
         return account;
     }
@@ -169,6 +175,18 @@ public class AccountBL {
 
     }
 
+    public List<Transaction> getAllTransactions(int accountId) throws AccountNotFoundException {
+        return this.transactionBL.getAllTransactions(accountId);
+    }
+
+
+    public List<Loan> getAllLoanTransactions(int accountId) throws AccountNotFoundException {
+        return loanBL.getAllLoans(accountId);
+    }
+
+    public int getCustomerId(int accountId) throws AccountNotFoundException {
+        return accountDAO.findCustomerIdByAccountId(accountId);
+    }
 
 
 

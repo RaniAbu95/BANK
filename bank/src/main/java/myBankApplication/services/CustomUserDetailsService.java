@@ -26,7 +26,7 @@ public class CustomUserDetailsService implements UserDetailsService {
         }
         // Create a list of roles or authorities
         List<GrantedAuthority> authorities = new ArrayList<>();
-        if(!user.getUserName().equals("Admin")){
+        if(!user.getUserName().equals("ADMIN")){
             authorities.add(new SimpleGrantedAuthority("ROLE_USER"));// Example role
             user.setRole("ROLE_USER");
 

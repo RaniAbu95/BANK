@@ -41,7 +41,7 @@ public class UserBL {
 
     public User addNewUser(User user) throws UseerNotSavedInDataBaseErrorException, UserUserNameErrorException, UserPasswordErrorException {
         checkUser(user);
-
+        user.setEmailVerify("EmailUnVerified");
         //add your email function here - check code before add to the DB
 
         //createUser(user.getUserName(), user.getPassword(),user.ge )
@@ -88,6 +88,7 @@ public class UserBL {
         //user.setPassword(passwordEncoder.encode(password));
         user.setPassword(password);
         user.setRole(roles.get(1)); // Save roles in the user object
+
         userDAO.save(user);
 
 
@@ -95,7 +96,18 @@ public class UserBL {
     }
 
     public void createAdmin(String username, String password) {
-        createUser(username, password, List.of("ADMIN"));
+            createUser(username, password, List.of("ADMIN"));
+    }
+
+    public void emailVerfiyed(int userId) throws CustomerNotSavedInDataBaseErrorException, CustomerNotFoundException, UseerNotSavedInDataBaseErrorException {
+        Optional<User> userToUpdate = this.userDAO.findById(userId);
+        if (userToUpdate.isPresent()) {
+            userToUpdate.get().setEmailVerify("EmailVerfiyed");
+            saveUserInDataBase(userToUpdate.get());
+
+        } else {
+            throw new CustomerNotFoundException();
+        }
     }
 
 
