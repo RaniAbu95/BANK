@@ -1,14 +1,12 @@
 package myBankApplication.BL;
 
+import myBankApplication.beans.*;
 import myBankApplication.services.EmailService;
-import myBankApplication.beans.Account;
-import myBankApplication.beans.Banker;
-import myBankApplication.beans.Customer;
-import myBankApplication.beans.User;
 import myBankApplication.dao.CustomerDAO;
 
 import myBankApplication.exceptions.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import javax.security.auth.login.AccountNotFoundException;
@@ -52,8 +50,6 @@ public class CustomerBL {
             throw new CustomerIdErrorException();
         }
 
-            emailService.sendAccountEmail("baselasli2@gmail.com", "Welcome", "Thank you for creating an account with us.");
-
     }
 
     public Customer getCustomer(int id) throws CustomerNotFoundException {
@@ -71,9 +67,8 @@ public class CustomerBL {
         User user = new User();
         user.setUserName(customer.getUsername());
         user.setPassword(customer.getPassword());
-
         //should add create or add
-
+        emailService.sendAccountEmail(customer.getEmail(), "Welcome", "Thank you for creating an account with us.");
 
         userBL.addNewUser(user);
     }
@@ -147,5 +142,37 @@ public class CustomerBL {
             }
         }
 
+
+    public void emailVerfiyed(int customerId) throws CustomerNotSavedInDataBaseErrorException, CustomerNotFoundException {
+        Optional<Customer> customerToUpdate = this.customerDAO.findById(customerId);
+        if (customerToUpdate.isPresent()) {
+            customerToUpdate.get().setEmailVerify("EmailVerfiyed");
+            saveCustomerInDataBase(customerToUpdate.get());
+
+        } else {
+            throw new CustomerNotFoundException();
+        }
+
     }
+
+
+    public String getCustomerEmail(int customerId) throws CustomerNotFoundException {
+        Optional<Customer> customer = this.customerDAO.findById(customerId);
+        return customer.get().getEmail();
+    }
+
+    @Scheduled(cron = "0 0 12 * * *")
+    public void sendBalanceOutOfRangeEmail()  {
+        List <Customer> customersList = customerDAO.findAll();
+        for (Customer customer : customersList) {
+            List<Account> accountList = customer.getAccounts();
+            for (Account account : accountList) {
+                if(account.getBalance()<0 ){
+                    String email = customer.getEmail();
+                    emailService.sendAccountEmail(email, "you're balance out of the range", "Sorry, Please check your account.");
+                }
+            }
+        }
+    }
+}
 

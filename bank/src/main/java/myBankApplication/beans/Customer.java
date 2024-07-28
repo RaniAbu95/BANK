@@ -24,9 +24,12 @@ public class Customer {
     private String location;
     @Column (name="Status")
     private String status;
-    @OneToMany(mappedBy = "customer", fetch = FetchType.LAZY)
+    @Column(name="EmailVerify")
+    private String emailVerify;
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "customer")
     @JsonIgnoreProperties
     private List<Account> accounts;
+
 
 
 
@@ -39,6 +42,7 @@ public class Customer {
         this.email = email;
         this.password = password;
         this.status = "Active";
+        this.emailVerify = "EmailUnVerify";
     }
 
     public String getStatus() {
@@ -101,5 +105,13 @@ public class Customer {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getEmailVerify() {
+        return emailVerify;
+    }
+
+    public void setEmailVerify(String emailVerify) {
+        this.emailVerify = emailVerify;
     }
 }

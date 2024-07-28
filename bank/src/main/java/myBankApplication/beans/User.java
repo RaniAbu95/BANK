@@ -23,6 +23,8 @@ public class User {
     private String location;
     @Column(name="email")
     private String email;
+    @Column(name="EmailVerify")
+    private String emailVerify;
 
     public User() {
     }
@@ -33,6 +35,8 @@ public class User {
         this.role = role;
         this.location = location;
         this.email = email;
+        this.emailVerify = "EmailUnVerifiyed";
+
     }
 
     public int getId() {
@@ -65,5 +69,29 @@ public class User {
 
     public void setRole(String role) {
         this.role = role;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getEmailVerify() {
+        return emailVerify;
+    }
+
+    public void setEmailVerify(String emailVerify) {
+        this.emailVerify = emailVerify;
     }
 }

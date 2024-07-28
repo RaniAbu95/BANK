@@ -3,6 +3,8 @@ package myBankApplication.controllers;
 import myBankApplication.BL.AccountBL;
 import myBankApplication.beans.Account;
 import myBankApplication.beans.Banker;
+import myBankApplication.beans.Loan;
+import myBankApplication.beans.Transaction;
 import myBankApplication.exceptions.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -19,7 +21,7 @@ public class AccountController {
 
 
     @PostMapping("add")
-    public Account add(@RequestParam int customerId,@RequestParam String  category,@RequestParam String password) throws AccountsAlreadyExistException, AccountBalanceErrorException, AccountPasswordErrorException, CustomerNotFoundException, AccountCategoryErrorException, AccountNotFoundException, AccountNotSavedInDataBaseErrorException, BankerNotSavedInDataBaseErrorException//Params passed as query string
+    public Account add(@RequestParam int customerId,@RequestParam String  category,@RequestParam String password) throws AccountsAlreadyExistException, AccountBalanceErrorException, AccountPasswordErrorException, CustomerNotFoundException, AccountCategoryErrorException, AccountNotFoundException, AccountNotSavedInDataBaseErrorException, BankerNotSavedInDataBaseErrorException, CustomerEmailUnVerfiyedErrorException//Params passed as query string
     {
         Account account = new Account(category, password);
         account.setCustomer(accountBL.getCustomer(customerId));
@@ -38,6 +40,17 @@ public class AccountController {
     public double getBalance(@PathVariable int accountId) throws AccountNotFoundException {
         return  accountBL.getAccountBalance(accountId);
     }
+
+    @GetMapping("getAllTransactions/{accountId}")
+    public List<Transaction> getLastTransactions(@PathVariable int accountId) throws AccountNotFoundException {
+        return this.accountBL.getAllTransactions(accountId);
+    }
+
+    @GetMapping("getAllLoans/{accountId}")
+    public List<Loan> getAllLoans(@PathVariable int accountId) throws AccountNotFoundException {
+        return this.accountBL.getAllLoanTransactions(accountId);
+    }
+
 
     @GetMapping("getAll")
     public List<Account> getAllAccounts() {

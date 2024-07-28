@@ -49,7 +49,8 @@ public class VisaInstallmentsBL {
         }
     }
 
-    //@Scheduled(fixedRate = 30000)
+    @Scheduled(cron = "*/5 * * * * *")
+    //@Scheduled(cron = "0 0 12 15 * ?")
     public void visaInstallmentsPayment() throws AccountNotFoundException, TransactionAlreadyExistException, TransactionTargetNotFoundErrorException, LoanAlreadyExistException, TransactionOperationNotFoundErrorException, LoanTypeErrorException, TransactionNotSavedInDatabase, AccountBalanceErrorException, LoanAmountErrorException, TransactionAmountNotFoundErrorException, businessLoanAmounLessThan10k, TransactionTimestampNotFoundErrorException, VisaInstallmentsNotSavedInDatabase {
         LocalDateTime currentDateTime = LocalDateTime.now();
         System.out.println("paymentOfInstallments is called");

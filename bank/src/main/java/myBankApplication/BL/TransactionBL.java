@@ -2,14 +2,17 @@ package myBankApplication.BL;
 
 //import myBankApplication.services.EmailService;
 import myBankApplication.beans.Account;
+import myBankApplication.beans.Customer;
 import myBankApplication.beans.Loan;
 import myBankApplication.beans.Transaction;
 import myBankApplication.dao.TransactionDAO;
 import myBankApplication.exceptions.*;
+import myBankApplication.services.EmailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.security.auth.login.AccountNotFoundException;
+import java.util.List;
 import java.util.Optional;
 @Service
 public class TransactionBL {
@@ -25,6 +28,12 @@ public class TransactionBL {
 
     @Autowired
     private CurrencyExchangeRateBL currencyExchangeRateBL;
+
+    @Autowired
+    private EmailService emailService;
+
+    @Autowired
+    private CustomerBL customerBL;
 
 
 
@@ -113,23 +122,6 @@ public class TransactionBL {
             transaction.setAmount(amountInILS);
             cashWithdrawal(transaction);
         }
-
-
-
-
-
-
-        //if(transaction.getOperation()=="cashDeposit"){}
-        //if(transaction.getOperation()=="cashDeposit"){}
-
-
-        //  إيداع العملات الأجنبية في الحساب
-        //  سحب العملات الأجنبية من الحساب
-        //          القروض   <<<<
-        //  وديعة في حساب العميل
-        //   سحب من حساب العميل
-        // سداد القرض
-        //  صرف العملات الأجنبية
     }
 
 
@@ -151,13 +143,29 @@ public class TransactionBL {
     private boolean cashWithdrawal(Transaction transaction) throws TransactionNotSavedInDatabase {
         try {
             int accountId = accountBL.getAccountId(transaction.getAccount());
-            double accountBalanceFromDatabase = accountBL.getAccountBalance(accountBL.getAccountId(transaction.getAccount()));
+            double accountBalanceFromDatabase = accountBL.getAccountBalance(accountId);
+            int customerId = accountBL.getCustomerId(accountId);
+            if (!balanceOutOfRangecheck(accountBalanceFromDatabase, transaction.getAmount(),transaction.getAccount().getAccountId(),customerId)) {
+                return false;
+            }
+
             double newBalance = accountBalanceFromDatabase - transaction.getAmount();
             accountBL.updateAccountBalance(accountId, newBalance);
             return true;
+
         } catch (Exception e) {
             throw new TransactionNotSavedInDatabase();
         }
+    }
+
+    private boolean balanceOutOfRangecheck(double balance, double cashWithdrawal, int accountId,int customerId) throws CustomerNotFoundException, AccountNotFoundException {
+        Account account = accountBL.getAccount(accountId);
+        if (balance - cashWithdrawal<account.getRestriction()) {
+            String email = customerBL.getCustomerEmail(customerId);
+            emailService.sendAccountEmail(email, "Withdrawal failed", "Sorry, withdrawal failed: balance insufficient. Please check your account.");
+            return false;
+        }
+        return true;
     }
 
     private boolean CashTransfare(Transaction transaction) throws TransactionNotSavedInDatabase {
@@ -203,6 +211,12 @@ public class TransactionBL {
         loanBL.createNewLoan(amount,accountId);
 
     }
+
+    public List<Transaction> getAllTransactions(int accountId) throws AccountNotFoundException {
+        Account account = this.accountBL.getAccount(accountId);
+        return this.transactionDao.findAllByAccount(account);
+    }
+
 
 
 
