@@ -10,9 +10,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
 public class ExchangeResult {
 
 	@JsonProperty("provider")
@@ -36,4 +33,73 @@ public class ExchangeResult {
 	@JsonProperty("rates")
 	private Map<String, Double> rates = new HashMap<>();/*Rates rates;*/
 
+	public ExchangeResult() {
+	}
+
+	public ExchangeResult(String provider, String warningUpgradeToV6, String terms, String base,
+			LocalDate date, Integer timeLastUpdated, Map<String, Double> rates) {
+		this.provider = provider;
+		this.warningUpgradeToV6 = warningUpgradeToV6;
+		this.terms = terms;
+		this.base = base;
+		this.date = date;
+		this.timeLastUpdated = timeLastUpdated;
+		this.rates = rates;
+	}
+
+	public String getProvider() {
+		return provider;
+	}
+
+	public void setProvider(String provider) {
+		this.provider = provider;
+	}
+
+	public String getWarningUpgradeToV6() {
+		return warningUpgradeToV6;
+	}
+
+	public void setWarningUpgradeToV6(String warningUpgradeToV6) {
+		this.warningUpgradeToV6 = warningUpgradeToV6;
+	}
+
+	public String getTerms() {
+		return terms;
+	}
+
+	public void setTerms(String terms) {
+		this.terms = terms;
+	}
+
+	public String getBase() {
+		return base;
+	}
+
+	public void setBase(String base) {
+		this.base = base;
+	}
+
+	public LocalDate getDate() {
+		return date;
+	}
+
+	public void setDate(LocalDate date) {
+		this.date = date;
+	}
+
+	public Integer getTimeLastUpdated() {
+		return timeLastUpdated;
+	}
+
+	public void setTimeLastUpdated(Integer timeLastUpdated) {
+		this.timeLastUpdated = timeLastUpdated;
+	}
+
+	public Map<String, Double> getRates() {
+		return rates;
+	}
+
+	public void setRates(Map<String, Double> rates) {
+		this.rates = rates;
+	}
 }
