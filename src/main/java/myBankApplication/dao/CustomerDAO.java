@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
 public interface CustomerDAO extends JpaRepository<Customer, Integer> {
+    Customer findFirstByUsername(String username);
 //    @Transactional
 //    @Modifying
 //    @Query(value = "UPDATE customers SET email =:newEmail WHERE customer_id = :customerId", nativeQuery = true)

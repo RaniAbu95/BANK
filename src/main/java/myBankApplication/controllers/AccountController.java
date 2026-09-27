@@ -7,6 +7,7 @@ import myBankApplication.beans.Loan;
 import myBankApplication.beans.Transaction;
 import myBankApplication.exceptions.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import javax.security.auth.login.AccountNotFoundException;
@@ -51,6 +52,11 @@ public class AccountController {
         return this.accountBL.getAllLoanTransactions(accountId);
     }
 
+
+    @GetMapping("my")
+    public List<Account> getMyAccounts(Authentication authentication) {
+        return accountBL.getAccountsByUserName(authentication.getName());
+    }
 
     @GetMapping("getAll")
     public List<Account> getAllAccounts() {

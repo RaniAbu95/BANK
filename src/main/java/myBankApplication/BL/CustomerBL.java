@@ -52,6 +52,10 @@ public class CustomerBL {
 
     }
 
+    public Customer getCustomerByUserName(String userName) {
+        return this.customerDAO.findFirstByUsername(userName);
+    }
+
     public Customer getCustomer(int id) throws CustomerNotFoundException {
         Optional<Customer> customer = this.customerDAO.findById(id);
         if(customer.isPresent()){

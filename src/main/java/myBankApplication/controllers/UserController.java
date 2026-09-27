@@ -69,9 +69,14 @@ public class UserController {
 
 
     @PostMapping("/verify")
-    public ResponseEntity<String> verify(@RequestParam String email, @RequestParam String code, @RequestParam int userId) throws CustomerNotSavedInDataBaseErrorException, CustomerNotFoundException, UseerNotSavedInDataBaseErrorException, UseerNotSavedInDataBaseErrorException, CustomerNotSavedInDataBaseErrorException, CustomerNotFoundException {
+    public ResponseEntity<String> verify(@RequestParam String email, @RequestParam String code, @RequestParam(required = false) Integer userId) throws CustomerNotSavedInDataBaseErrorException, CustomerNotFoundException, UseerNotSavedInDataBaseErrorException, UseerNotSavedInDataBaseErrorException, CustomerNotSavedInDataBaseErrorException, CustomerNotFoundException {
         if (emailService.verifyCode(email, code)) {
-            userBl.emailVerfiyed(userId);
+            // userId is optional - the user is found by email, since signup doesn't return the id
+            if (userId != null) {
+                userBl.emailVerfiyed(userId);
+            } else {
+                userBl.emailVerfiyedByEmail(email);
+            }
             return ResponseEntity.ok("Email verified successfully.");
         } else {
             return ResponseEntity.status(400).body("Verification failed. Invalid code.");

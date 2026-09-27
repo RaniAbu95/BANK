@@ -44,6 +44,7 @@ public class SecurityConfig {
                                 .requestMatchers("/signup").permitAll()
                                 .requestMatchers("/verify").permitAll()
                                 // Allow both USER and ADMIN roles to access these URLs
+                                .requestMatchers("/accounts/my").hasAnyRole("USER", "ADMIN")
                                 .requestMatchers("/accounts/getBalance/**").hasAnyRole("USER", "ADMIN")
                                 .requestMatchers("/accounts/getAllTransactions/**").hasAnyRole("USER", "ADMIN")
                                 .requestMatchers("/accounts/getAllLoans/**").hasAnyRole("USER", "ADMIN")

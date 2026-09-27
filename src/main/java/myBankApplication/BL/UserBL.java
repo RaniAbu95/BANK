@@ -99,6 +99,14 @@ public class UserBL {
             createUser(username, password, List.of("ADMIN"));
     }
 
+    public void emailVerfiyedByEmail(String email) throws CustomerNotSavedInDataBaseErrorException, CustomerNotFoundException, UseerNotSavedInDataBaseErrorException {
+        User user = this.userDAO.findFirstByEmail(email);
+        if (user == null) {
+            throw new CustomerNotFoundException();
+        }
+        emailVerfiyed(user.getId());
+    }
+
     public void emailVerfiyed(int userId) throws CustomerNotSavedInDataBaseErrorException, CustomerNotFoundException, UseerNotSavedInDataBaseErrorException {
         Optional<User> userToUpdate = this.userDAO.findById(userId);
         if (userToUpdate.isPresent()) {

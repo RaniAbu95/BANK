@@ -175,6 +175,15 @@ public class AccountBL {
 
     }
 
+    // User and Customer are linked by user name (see CustomerBL.addNewCustomer)
+    public List<Account> getAccountsByUserName(String userName) {
+        Customer customer = this.customerBL.getCustomerByUserName(userName);
+        if (customer == null || customer.getAccounts() == null) {
+            return new ArrayList<>();
+        }
+        return customer.getAccounts();
+    }
+
     public List<Transaction> getAllTransactions(int accountId) throws AccountNotFoundException {
         return this.transactionBL.getAllTransactions(accountId);
     }
