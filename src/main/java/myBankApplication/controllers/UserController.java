@@ -10,6 +10,7 @@ import myBankApplication.exceptions.UseerNotSavedInDataBaseErrorException;
 import myBankApplication.services.EmailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -58,7 +59,7 @@ public class UserController {
             );
         }
         catch (Exception ex) {
-            throw new Exception("inavalid username/password");
+            throw new BadCredentialsException("inavalid username/password");
         }
         // Load user details
         UserDetails userDetails = customUserDetailsService.loadUserByUsername(authRequest.getUserName());
