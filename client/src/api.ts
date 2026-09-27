@@ -33,15 +33,17 @@ export class ApiError extends Error {
 type Params = Record<string, string | number | undefined>
 
 function messageFor(status: number, body: string): string {
-  if (status === 401 || status === 403) return 'אין הרשאה לפעולה זו. יש להתחבר מחדש או להשתמש במשתמש מנהל.'
-  // שגיאה בפורמט ברירת המחדל של Spring: { status, error, message, path }
+  // שגיאה בפורמט של Spring / GlobalExceptionHandler: { status, error, message, path }
+  let json: { message?: string; error?: string } | null = null
   try {
-    const json = JSON.parse(body)
-    if (json?.message) return json.message
-    if (json?.error) return `שגיאת שרת (${status}): ${json.error}`
+    json = JSON.parse(body)
   } catch {
-    if (body && body.length < 300) return body
+    /* לא JSON */
   }
+  if (json?.message) return json.message
+  if (status === 401 || status === 403) return 'אין הרשאה לפעולה זו. יש להתחבר מחדש או להשתמש במשתמש מנהל.'
+  if (json?.error) return `שגיאת שרת (${status}): ${json.error}`
+  if (!json && body && body.length < 300) return body
   return `שגיאת שרת (${status})`
 }
 
