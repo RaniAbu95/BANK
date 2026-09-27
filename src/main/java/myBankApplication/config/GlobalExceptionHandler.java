@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mail.MailException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -77,6 +78,12 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(AuthenticationException.class)
     public ResponseEntity<Map<String, Object>> handleAuthentication(AuthenticationException ex, HttpServletRequest request) {
         return body(HttpStatus.UNAUTHORIZED, "שם משתמש או סיסמה שגויים", request);
+    }
+
+    @ExceptionHandler(MailException.class)
+    public ResponseEntity<Map<String, Object>> handleMail(MailException ex, HttpServletRequest request) {
+        log.error("Mail sending failed on {} {}", request.getMethod(), request.getRequestURI(), ex);
+        return body(HttpStatus.SERVICE_UNAVAILABLE, "שליחת המייל נכשלה, נסו שוב מאוחר יותר", request);
     }
 
     @ExceptionHandler(Exception.class)
