@@ -13,6 +13,8 @@ const OPERATIONS: { value: Operation; label: string }[] = [
 const OP_LABEL = Object.fromEntries(OPERATIONS.map((o) => [o.value, o.label])) as Record<string, string>
 const CURRENCIES = ['USD', 'EUR', 'GBP', 'JPY', 'CHF', 'CAD', 'AUD']
 const LAST_ACCOUNT_KEY = 'bank.lastAccount'
+// "Buisness" — כך השרת שומר את הקטגוריה (ראו AccountBL.setRestrictionAmount)
+const CATEGORY_LABEL: Record<string, string> = { Saving: 'חיסכון', Buisness: 'עסקי', Business: 'עסקי', Student: 'סטודנט' }
 
 function readLastAccount(): string {
   try {
@@ -36,12 +38,15 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(false)
   const [myAccounts, setMyAccounts] = useState<Account[] | null>(null)
 
-  // החשבונות של המשתמש המחובר; אם אין חשבון שמור — בוחרים את הראשון
+  // החשבונות של המשתמש המחובר; אם החשבון השמור לא שלו (או שאין) — בוחרים את הראשון
   useEffect(() => {
     accounts.mine().then(
       (list) => {
         setMyAccounts(list)
-        if (list.length) setAccountId((cur) => cur ?? list[0].accountId)
+        const saved = Number(readLastAccount())
+        if (list.length && !list.some((a) => a.accountId === saved)) {
+          chooseAccount(list[0].accountId)
+        }
       },
       () => setMyAccounts([]),
     )
@@ -97,6 +102,7 @@ export default function Dashboard() {
                 onClick={() => chooseAccount(a.accountId)}
               >
                 <strong>חשבון {a.accountId}</strong>
+                <span className="muted small">{CATEGORY_LABEL[a.category] ?? a.category}</span>
                 <span className="muted small">{a.status === 'Active' ? formatILS(a.balance) : 'מושהה'}</span>
               </button>
             ))}
@@ -219,7 +225,8 @@ function TransactionsTable({ rows }: { rows: Transaction[] | null | undefined })
               <td>{OP_LABEL[t.operation] ?? t.operation}</td>
               <td className="num">{t.amount.toLocaleString('he-IL')}</td>
               <td>{t.target ?? '—'}</td>
-              <td>{t.foreigCurrencyToExchange ?? '—'}</td>
+              {/* השרת שומר מטבע רק בפעולות מט"ח (ובתשלומים את המחרוזת "null"); כל השאר בשקלים */}
+              <td>{t.foreigCurrencyToExchange && t.foreigCurrencyToExchange !== 'null' ? t.foreigCurrencyToExchange : '₪'}</td>
             </tr>
           ))}
         </tbody>

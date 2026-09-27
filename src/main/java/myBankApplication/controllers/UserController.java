@@ -45,8 +45,9 @@ public class UserController {
 
     @PostMapping("/signup")
     public ResponseEntity<String> createUser(@RequestBody User user) throws Exception {
-        userBl.addNewUser(user);
+        // שולחים קודם את מייל האימות, כדי שכשל בשליחה לא ישאיר משתמש יתום ולא מאומת ב-DB
         emailService.sendVerificationEmail(user.getEmail());
+        userBl.addNewUser(user);
         return ResponseEntity.ok("User registered successfully");
     }
 
