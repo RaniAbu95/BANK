@@ -5,9 +5,14 @@ import myBankApplication.services.EmailService;
 import myBankApplication.dao.CustomerDAO;
 
 import myBankApplication.exceptions.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.security.auth.login.AccountNotFoundException;
 import java.util.List;
@@ -16,6 +21,8 @@ import java.util.Optional;
 
 @Service
 public class CustomerBL {
+
+    private static final Logger log = LoggerFactory.getLogger(CustomerBL.class);
 
     @Autowired
     private CustomerDAO customerDAO;
@@ -65,9 +72,46 @@ public class CustomerBL {
     }
 
 
-    public void addNewCustomer(Customer customer) throws CustomerEmailErrorException, CustomerLocationErrorException, CustomerIdErrorException, CustomerIsNotExistException, CustomerNotSavedInDataBaseErrorException, UseerNotSavedInDataBaseErrorException, UserUserNameErrorException, UserPasswordErrorException {
+    // הרשמה (/signup): יוצרים משתמש, לקוח מקושר (לפי שם משתמש) וחשבון בנק עם מספר חשבון.
+    // הכול בטרנזקציה אחת — אם פתיחת החשבון נכשלת לא נשאר משתמש בלי חשבון
+    @Transactional(rollbackFor = Exception.class)
+    public Account registerUser(User user) throws UseerNotSavedInDataBaseErrorException, UserUserNameErrorException, UserPasswordErrorException, CustomerEmailErrorException, CustomerLocationErrorException, CustomerIdErrorException, CustomerIsNotExistException, CustomerNotSavedInDataBaseErrorException, AccountNotSavedInDataBaseErrorException, BankerNotSavedInDataBaseErrorException, NoBankerAvailableException {
+        userBL.addNewUser(user);
+        Customer customer = new Customer(user.getLocation(), user.getUserName(), user.getEmail(), user.getPassword());
         checkCustomer(customer);
         saveCustomerInDataBase(customer);
+        return accountBL.openDefaultAccount(customer, user.getPassword());
+    }
+
+    // משתמשים שנרשמו לפני שההרשמה פתחה חשבון אוטומטית מקבלים לקוח וחשבון בעליית השרת
+    @EventListener(ApplicationReadyEvent.class)
+    public void openAccountsForUsersWithoutAccount() {
+        for (User user : userBL.getAllUsers()) {
+            // ADMIN הוא משתמש הניהול (ראו CustomUserDetailsService) — אין לו חשבון בנק
+            if (user.getUserName() == null || user.getUserName().equals("ADMIN")) {
+                continue;
+            }
+            try {
+                Customer customer = getCustomerByUserName(user.getUserName());
+                if (customer == null) {
+                    customer = new Customer(user.getLocation(), user.getUserName(), user.getEmail(), user.getPassword());
+                    saveCustomerInDataBase(customer);
+                } else if (customer.getAccounts() != null && !customer.getAccounts().isEmpty()) {
+                    continue;
+                }
+                Account account = accountBL.openDefaultAccount(customer, user.getPassword());
+                log.info("Opened account {} for existing user {}", account.getAccountNumber(), user.getUserName());
+            } catch (Exception e) {
+                log.error("Could not open an account for existing user {}", user.getUserName(), e);
+            }
+        }
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public Account addNewCustomer(Customer customer) throws CustomerEmailErrorException, CustomerLocationErrorException, CustomerIdErrorException, CustomerIsNotExistException, CustomerNotSavedInDataBaseErrorException, UseerNotSavedInDataBaseErrorException, UserUserNameErrorException, UserPasswordErrorException, AccountNotSavedInDataBaseErrorException, BankerNotSavedInDataBaseErrorException, NoBankerAvailableException {
+        checkCustomer(customer);
+        saveCustomerInDataBase(customer);
+        Account account = accountBL.openDefaultAccount(customer, customer.getPassword());
         User user = new User();
         user.setUserName(customer.getUsername());
         user.setPassword(customer.getPassword());
@@ -75,6 +119,7 @@ public class CustomerBL {
         emailService.sendAccountEmail(customer.getEmail(), "Welcome", "Thank you for creating an account with us.");
 
         userBL.addNewUser(user);
+        return account;
     }
 
     public void deleteCustomer(int customerId) throws CustomerIsNotExistException, AccountNotSavedInDataBaseErrorException, AccountNotFoundException, BankerNotFoundException, BankerNotSavedInDataBaseErrorException {

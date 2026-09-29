@@ -4,10 +4,16 @@ import { ActionForm, Field, str } from '../components/ui'
 
 export default function Verify() {
   const [params] = useSearchParams()
+  const accountNumber = params.get('account')
   return (
     <div className="auth-page">
       <div className="auth-box">
         <h1>אימות דוא"ל</h1>
+        {accountNumber && (
+          <p>
+            נפתח עבורך חשבון בנק מספר <strong>{accountNumber}</strong>
+          </p>
+        )}
         <p className="muted">הזן את הקוד שנשלח אליך במייל.</p>
         <ActionForm
           submitLabel="אימות"

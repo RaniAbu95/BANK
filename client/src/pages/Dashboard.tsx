@@ -1,29 +1,20 @@
 import { useCallback, useEffect, useState } from 'react'
-import { accounts, transactions, type Account, type Loan, type Operation, type Transaction } from '../api'
+import { useOutletContext } from 'react-router-dom'
+import { accounts, transactions, type Loan, type Operation, type Transaction } from '../api'
+import { useAuth } from '../auth'
+import { readLastAccount, type AccountSelection } from '../accountSelection'
 import { ActionForm, Alert, Card, Field, formatILS, num, str } from '../components/ui'
 
-const OPERATIONS: { value: Operation; label: string }[] = [
-  { value: 'cashDeposit', label: 'הפקדה' },
-  { value: 'cashWithdrawal', label: 'משיכה' },
-  { value: 'CashTransfare', label: 'העברה לחשבון אחר' },
-  { value: 'Loan', label: 'בקשת הלוואה' },
-  { value: 'DepositForeignCurrency', label: 'הפקדת מט"ח' },
-  { value: 'WithDrawlForeignCurrency', label: 'משיכת מט"ח' },
+const OPERATIONS: { value: Operation; label: string; icon: string }[] = [
+  { value: 'cashDeposit', label: 'הפקדה', icon: '⬇' },
+  { value: 'cashWithdrawal', label: 'משיכה', icon: '⬆' },
+  { value: 'CashTransfare', label: 'העברה לחשבון אחר', icon: '⇄' },
+  { value: 'Loan', label: 'בקשת הלוואה', icon: '％' },
+  { value: 'DepositForeignCurrency', label: 'הפקדת מט"ח', icon: '$' },
+  { value: 'WithDrawlForeignCurrency', label: 'משיכת מט"ח', icon: '€' },
 ]
 const OP_LABEL = Object.fromEntries(OPERATIONS.map((o) => [o.value, o.label])) as Record<string, string>
 const CURRENCIES = ['USD', 'EUR', 'GBP', 'JPY', 'CHF', 'CAD', 'AUD']
-const LAST_ACCOUNT_KEY = 'bank.lastAccount'
-// "Buisness" — כך השרת שומר את הקטגוריה (ראו AccountBL.setRestrictionAmount)
-const CATEGORY_LABEL: Record<string, string> = { Saving: 'חיסכון', Buisness: 'עסקי', Business: 'עסקי', Student: 'סטודנט' }
-
-function readLastAccount(): string {
-  try {
-    return localStorage.getItem(LAST_ACCOUNT_KEY) ?? ''
-  } catch {
-    return ''
-  }
-}
-
 interface AccountData {
   balance: number | null
   transactions: Transaction[] | null
@@ -32,25 +23,16 @@ interface AccountData {
 }
 
 export default function Dashboard() {
+  const { session } = useAuth()
+  const { myAccounts, accountId, chooseAccount, updateBalance } = useOutletContext<AccountSelection>()
   const [accountInput, setAccountInput] = useState(readLastAccount)
-  const [accountId, setAccountId] = useState<number | null>(() => Number(readLastAccount()) || null)
   const [data, setData] = useState<AccountData | null>(null)
   const [loading, setLoading] = useState(false)
-  const [myAccounts, setMyAccounts] = useState<Account[] | null>(null)
+  const selected = myAccounts?.find((a) => a.accountId === accountId)
 
-  // החשבונות של המשתמש המחובר; אם החשבון השמור לא שלו (או שאין) — בוחרים את הראשון
   useEffect(() => {
-    accounts.mine().then(
-      (list) => {
-        setMyAccounts(list)
-        const saved = Number(readLastAccount())
-        if (list.length && !list.some((a) => a.accountId === saved)) {
-          chooseAccount(list[0].accountId)
-        }
-      },
-      () => setMyAccounts([]),
-    )
-  }, [])
+    if (accountId) setAccountInput(String(accountId))
+  }, [accountId])
 
   const load = useCallback(async (id: number) => {
     setLoading(true)
@@ -61,6 +43,8 @@ export default function Dashboard() {
       accounts.getLoans(id),
     ])
     const errors = [b, t, l].flatMap((r) => (r.status === 'rejected' ? [String(r.reason?.message ?? r.reason)] : []))
+    // רשימת החשבונות נטענה פעם אחת — מעדכנים בה את היתרה העדכנית
+    if (b.status === 'fulfilled') updateBalance(id, b.value)
     setData({
       balance: b.status === 'fulfilled' ? b.value : null,
       transactions: t.status === 'fulfilled' ? t.value : null,
@@ -68,7 +52,7 @@ export default function Dashboard() {
       errors: [...new Set(errors)],
     })
     setLoading(false)
-  }, [])
+  }, [updateBalance])
 
   useEffect(() => {
     if (accountId) load(accountId)
@@ -79,60 +63,41 @@ export default function Dashboard() {
     chooseAccount(Number(accountInput))
   }
 
-  function chooseAccount(id: number) {
-    if (!id) return
-    setAccountInput(String(id))
-    try {
-      localStorage.setItem(LAST_ACCOUNT_KEY, String(id))
-    } catch {
-      /* ignore */
-    }
-    setAccountId(id)
-  }
-
   return (
     <div className="stack">
-      <Card title="בחירת חשבון">
-        {myAccounts && myAccounts.length > 0 && (
-          <div className="account-list">
-            {myAccounts.map((a) => (
-              <button
-                key={a.accountId}
-                className={`account-chip ${a.accountId === accountId ? 'selected' : ''}`}
-                onClick={() => chooseAccount(a.accountId)}
-              >
-                <strong>חשבון {a.accountId}</strong>
-                <span className="muted small">{CATEGORY_LABEL[a.category] ?? a.category}</span>
-                <span className="muted small">{a.status === 'Active' ? formatILS(a.balance) : 'מושהה'}</span>
-              </button>
-            ))}
-          </div>
-        )}
+      <section className="dash-hero">
+        {myAccounts === null && <p className="muted small">טוען…</p>}
         {myAccounts && myAccounts.length === 0 && (
-          <p className="muted small">לא נמצאו חשבונות המקושרים למשתמש שלך. ניתן להזין מספר חשבון ידנית.</p>
+          <p className="muted small">
+            {session?.isAdmin ? 'למשתמש המנהל אין חשבון בנק. ניתן להזין מספר חשבון ידנית.' : 'לא נמצא חשבון בנק למשתמש שלך.'}
+          </p>
         )}
-        <form className="inline-form" onSubmit={selectAccount}>
-          <Field
-            label="מספר חשבון"
-            type="number"
-            min={1}
-            value={accountInput}
-            onChange={(e) => setAccountInput(e.target.value)}
-            required
-          />
-          <button className="btn btn-primary">הצג</button>
-        </form>
-      </Card>
+        {/* משתמש רגיל רואה רק את החשבונות שלו (לפי ההתחברות); הזנה ידנית — למנהל בלבד */}
+        {session?.isAdmin && (
+          <form className="inline-form" onSubmit={selectAccount}>
+            <Field
+              label="מספר חשבון"
+              type="number"
+              min={1}
+              value={accountInput}
+              onChange={(e) => setAccountInput(e.target.value)}
+              required
+            />
+            <button className="btn btn-primary">הצג</button>
+          </form>
+        )}
+      </section>
 
       {accountId && (
         <>
           {data?.errors.map((e) => <Alert key={e} kind="error">{e}</Alert>)}
 
-          <div className="grid-2">
+          <div className="dash-grid">
             <Card
-              title={`יתרה — חשבון ${accountId}`}
+              className="balance-card"
+              title={selected ? 'יתרה' : `יתרה — חשבון ${accountId}`}
               actions={
-                <button className="btn btn-ghost" onClick={() => load(accountId)} disabled={loading}>
+                <button className="btn btn-ghost btn-sm" onClick={() => load(accountId)} disabled={loading}>
                   {loading ? 'טוען…' : 'רענון'}
                 </button>
               }
@@ -140,19 +105,34 @@ export default function Dashboard() {
               <p className={`balance ${data?.balance != null && data.balance < 0 ? 'negative' : ''}`}>
                 {data?.balance != null ? formatILS(data.balance) : '—'}
               </p>
+              {selected?.restriction != null && (
+                // השרת שומר את המסגרת כמספר שלילי (למשל -10000 = מסגרת של 10,000)
+                <dl className="balance-details">
+                  <div>
+                    <dt>מסגרת עובר ושב</dt>
+                    <dd>{formatILS(Math.abs(selected.restriction))}</dd>
+                  </div>
+                  {data?.balance != null && (
+                    <div>
+                      <dt>יתרה זמינה למשיכה</dt>
+                      <dd>{formatILS(Math.max(0, data.balance - selected.restriction))}</dd>
+                    </div>
+                  )}
+                </dl>
+              )}
             </Card>
 
-            <Card title="ביצוע פעולה">
+            <Card className="op-card" title="ביצוע פעולה">
               <OperationForm accountId={accountId} onDone={() => load(accountId)} />
+            </Card>
+
+            <Card className="loans-card" title="הלוואות">
+              <LoansList rows={data?.loans} />
             </Card>
           </div>
 
           <Card title="פעולות אחרונות">
             <TransactionsTable rows={data?.transactions} />
-          </Card>
-
-          <Card title="הלוואות">
-            <LoansTable rows={data?.loans} />
           </Card>
         </>
       )}
@@ -180,14 +160,21 @@ function OperationForm({ accountId, onDone }: { accountId: number; onDone: () =>
         return msg || 'הפעולה בוצעה בהצלחה'
       }}
     >
-      <label className="field">
-        <span>סוג פעולה</span>
-        <select value={op} onChange={(e) => setOp(e.target.value as Operation)}>
-          {OPERATIONS.map((o) => (
-            <option key={o.value} value={o.value}>{o.label}</option>
-          ))}
-        </select>
-      </label>
+      <div className="op-tiles" role="radiogroup" aria-label="סוג פעולה">
+        {OPERATIONS.map((o) => (
+          <button
+            key={o.value}
+            type="button"
+            role="radio"
+            aria-checked={op === o.value}
+            className={`op-tile ${op === o.value ? 'selected' : ''}`}
+            onClick={() => setOp(o.value)}
+          >
+            <span className="op-icon" aria-hidden="true">{o.icon}</span>
+            {o.label}
+          </button>
+        ))}
+      </div>
       <Field label={isForex ? 'סכום במטבע זר' : 'סכום (₪)'} name="amount" type="number" min={1} step={1} required />
       {isTransfer && <Field label="חשבון יעד" name="target" type="number" min={1} required />}
       {isForex && (
@@ -235,31 +222,25 @@ function TransactionsTable({ rows }: { rows: Transaction[] | null | undefined })
   )
 }
 
-function LoansTable({ rows }: { rows: Loan[] | null | undefined }) {
+function LoansList({ rows }: { rows: Loan[] | null | undefined }) {
   if (!rows) return <p className="muted">—</p>
   if (!rows.length) return <p className="muted">אין הלוואות פעילות</p>
   return (
-    <div className="table-wrap">
-      <table>
-        <thead>
-          <tr><th>#</th><th>סוג</th><th>סכום</th><th>ריבית</th><th>תשלומים</th></tr>
-        </thead>
-        <tbody>
-          {rows.map((l) => (
-            <tr key={l.loanId}>
-              <td>{l.loanId}</td>
-              <td>{l.loanType}</td>
-              <td className="num">{formatILS(l.amount)}</td>
-              <td>{l.intersetRate}%</td>
-              <td>
-                <progress max={l.numberOfPayments} value={l.completedPayments} />{' '}
-                {l.completedPayments}/{l.numberOfPayments}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+    <ul className="loan-list">
+      {rows.map((l) => (
+        <li key={l.loanId}>
+          <div className="loan-row">
+            <strong>{l.loanType}</strong>
+            <span className="num">{formatILS(l.amount)}</span>
+          </div>
+          <progress max={l.numberOfPayments} value={l.completedPayments} />
+          <div className="loan-row muted small">
+            <span>{l.completedPayments}/{l.numberOfPayments} תשלומים</span>
+            <span>ריבית {l.intersetRate}%</span>
+          </div>
+        </li>
+      ))}
+    </ul>
   )
 }
 

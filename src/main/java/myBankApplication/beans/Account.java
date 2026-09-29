@@ -16,6 +16,10 @@ public class Account {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int accountId;
 
+    // מספר חשבון בנק בן 7 ספרות, ייחודי לכל חשבון (נוצר ב-AccountBL.generateAccountNumber)
+    @Column(name="account_number", unique = true)
+    private Integer accountNumber;
+
     @Column(name="balance")
     private double balance;
     @Column(name="category")
@@ -121,6 +125,14 @@ public class Account {
 
     public void setAccountId(int accountId) {
         this.accountId = accountId;
+    }
+
+    public Integer getAccountNumber() {
+        return accountNumber;
+    }
+
+    public void setAccountNumber(Integer accountNumber) {
+        this.accountNumber = accountNumber;
     }
 
     public double getBalance() {

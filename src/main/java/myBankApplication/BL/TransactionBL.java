@@ -8,14 +8,19 @@ import myBankApplication.beans.Transaction;
 import myBankApplication.dao.TransactionDAO;
 import myBankApplication.exceptions.*;
 import myBankApplication.services.EmailService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.security.auth.login.AccountNotFoundException;
 import java.util.List;
 import java.util.Optional;
 @Service
 public class TransactionBL {
+
+    private static final Logger log = LoggerFactory.getLogger(TransactionBL.class);
 
 
     @Autowired
@@ -51,6 +56,8 @@ public class TransactionBL {
     }
 
 
+    // בטרנזקציה אחת: אם הפעולה נכשלת (למשל חריגה ממסגרת) — לא נשמרת רשומת פעולה ולא משתנה אף יתרה
+    @Transactional(rollbackFor = Exception.class)
     public Transaction createNewTransaction(Integer target, String operation, String timeStamp ,double amount, int accountId,String foreignCurrency) throws AccountNotFoundException, TransactionAlreadyExistException, TransactionTargetNotFoundErrorException, TransactionOperationNotFoundErrorException, TransactionTimestampNotFoundErrorException, TransactionNotSavedInDatabase, TransactionAmountNotFoundErrorException, AccountBalanceErrorException, LoanAlreadyExistException, LoanTypeErrorException, LoanAmountErrorException, businessLoanAmounLessThan10k {
 
         Account account = getTransactionAccount(accountId);
@@ -140,49 +147,48 @@ public class TransactionBL {
 
     }
 
-    private boolean cashWithdrawal(Transaction transaction) throws TransactionNotSavedInDatabase {
+    private void cashWithdrawal(Transaction transaction) throws TransactionNotSavedInDatabase, TransactionExceedsLimitException {
+        int accountId = transaction.getAccount().getAccountId();
+        double accountBalanceFromDatabase;
         try {
-            int accountId = accountBL.getAccountId(transaction.getAccount());
-            double accountBalanceFromDatabase = accountBL.getAccountBalance(accountId);
-            int customerId = accountBL.getCustomerId(accountId);
-            if (!balanceOutOfRangecheck(accountBalanceFromDatabase, transaction.getAmount(),transaction.getAccount().getAccountId(),customerId)) {
-                return false;
-            }
+            accountBalanceFromDatabase = accountBL.getAccountBalance(accountId);
+        } catch (Exception e) {
+            throw new TransactionNotSavedInDatabase();
+        }
 
+        // מחוץ ל-try — כדי שהחריגה תגיע ללקוח ולא תוחלף ב-TransactionNotSavedInDatabase
+        checkWithdrawalWithinLimit(accountBalanceFromDatabase, transaction.getAmount(), transaction.getAccount());
+
+        try {
             double newBalance = accountBalanceFromDatabase - transaction.getAmount();
             accountBL.updateAccountBalance(accountId, newBalance);
-            return true;
-
         } catch (Exception e) {
             throw new TransactionNotSavedInDatabase();
         }
     }
 
-    private boolean balanceOutOfRangecheck(double balance, double cashWithdrawal, int accountId,int customerId) throws CustomerNotFoundException, AccountNotFoundException {
-        Account account = accountBL.getAccount(accountId);
-        if (balance - cashWithdrawal<account.getRestriction()) {
-            String email = customerBL.getCustomerEmail(customerId);
-            emailService.sendAccountEmail(email, "Withdrawal failed", "Sorry, withdrawal failed: balance insufficient. Please check your account.");
-            return false;
+    // המסגרת שמורה כמספר שלילי (למשל -10000): היתרה אחרי המשיכה לא יכולה לרדת מתחתיה
+    private void checkWithdrawalWithinLimit(double balance, double cashWithdrawal, Account account) throws TransactionExceedsLimitException {
+        Integer restriction = account.getRestriction();
+        if (restriction != null && balance - cashWithdrawal < restriction) {
+            try {
+                String email = account.getCustomer().getEmail();
+                emailService.sendAccountEmail(email, "Withdrawal failed", "Sorry, withdrawal failed: balance insufficient. Please check your account.");
+            } catch (Exception e) {
+                // כשל במייל לא אמור להסתיר מהלקוח את הסיבה האמיתית לדחייה
+                log.error("Could not send withdrawal-failed email for account {}", account.getAccountId(), e);
+            }
+            throw new TransactionExceedsLimitException();
         }
-        return true;
     }
 
-    private boolean CashTransfare(Transaction transaction) throws TransactionNotSavedInDatabase {
+    private void CashTransfare(Transaction transaction) throws TransactionNotSavedInDatabase, TransactionExceedsLimitException {
+        cashWithdrawal(transaction);
         try {
-            if (cashWithdrawal(transaction) == true) {
-                int accountId = accountBL.getAccountId(transaction.getAccount());
-                Integer targetAccountId = transaction.getTarget();
-
-
-                double accountBalanceFromDatabase = accountBL.getAccountBalance(targetAccountId);
-
-                double newBalance = accountBalanceFromDatabase + transaction.getAmount();
-                accountBL.updateAccountBalance(targetAccountId, newBalance);
-
-                return true;
-            }
-            return false;
+            Integer targetAccountId = transaction.getTarget();
+            double accountBalanceFromDatabase = accountBL.getAccountBalance(targetAccountId);
+            double newBalance = accountBalanceFromDatabase + transaction.getAmount();
+            accountBL.updateAccountBalance(targetAccountId, newBalance);
         } catch (Exception e) {
             throw new TransactionNotSavedInDatabase();
         }

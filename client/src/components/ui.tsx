@@ -13,9 +13,19 @@ export function Alert({ kind, children }: { kind: 'error' | 'success'; children:
   return <div className={`alert alert-${kind}`} role={kind === 'error' ? 'alert' : 'status'}>{children}</div>
 }
 
-export function Card({ title, children, actions }: { title?: string; children: ReactNode; actions?: ReactNode }) {
+export function Card({
+  title,
+  children,
+  actions,
+  className,
+}: {
+  title?: string
+  children: ReactNode
+  actions?: ReactNode
+  className?: string
+}) {
   return (
-    <section className="card">
+    <section className={className ? `card ${className}` : 'card'}>
       {(title || actions) && (
         <header className="card-header">
           {title && <h2>{title}</h2>}

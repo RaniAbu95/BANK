@@ -87,16 +87,14 @@ public class UserBL {
         user.setUserName(username);
         //user.setPassword(passwordEncoder.encode(password));
         user.setPassword(password);
-        user.setRole(roles.get(1)); // Save roles in the user object
+        user.setRole(roles.get(0)); // Save roles in the user object
+        user.setEmailVerify("EmailVerfiyed");
 
         userDAO.save(user);
-
-
-
     }
 
     public void createAdmin(String username, String password) {
-            createUser(username, password, List.of("ADMIN"));
+        createUser(username, password, List.of("ROLE_ADMIN"));
     }
 
     public void emailVerfiyedByEmail(String email) throws CustomerNotSavedInDataBaseErrorException, CustomerNotFoundException, UseerNotSavedInDataBaseErrorException {

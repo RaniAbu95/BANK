@@ -2,6 +2,7 @@ package myBankApplication.controllers;
 
 
 import myBankApplication.BL.CustomerBL;
+import myBankApplication.beans.Account;
 import myBankApplication.beans.Customer;
 import myBankApplication.exceptions.*;
 import myBankApplication.services.EmailService;
@@ -27,11 +28,11 @@ public class CustomerController {
 
     @PostMapping("add")
     public ResponseEntity<String> add(@RequestParam String location, @RequestParam String username,
-                                      @RequestParam String email, @RequestParam String password) throws CustomerEmailErrorException, CustomerLocationErrorException, CustomerIdErrorException, CustomerIsNotExistException, CustomerNotSavedInDataBaseErrorException, UseerNotSavedInDataBaseErrorException, UserUserNameErrorException, UserPasswordErrorException {
+                                      @RequestParam String email, @RequestParam String password) throws CustomerEmailErrorException, CustomerLocationErrorException, CustomerIdErrorException, CustomerIsNotExistException, CustomerNotSavedInDataBaseErrorException, UseerNotSavedInDataBaseErrorException, UserUserNameErrorException, UserPasswordErrorException, AccountNotSavedInDataBaseErrorException, BankerNotSavedInDataBaseErrorException, NoBankerAvailableException {
         Customer customer = new Customer(location, username, email, password);
-        çustomerBL.addNewCustomer(customer);
+        Account account = çustomerBL.addNewCustomer(customer);
         emailService.sendVerificationEmail(email);
-        return ResponseEntity.ok("Customer added successfully");
+        return ResponseEntity.ok("Customer added successfully. Account number: " + account.getAccountNumber());
     }
 
     @GetMapping("get")
