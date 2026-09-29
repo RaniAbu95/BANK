@@ -105,7 +105,7 @@ async function request<T>(method: string, path: string, opts: { params?: Params;
       body: opts.body !== undefined ? JSON.stringify(opts.body) : undefined,
     })
   } catch {
-    throw new ApiError(0, 'לא ניתן להתחבר לשרת. ודא ששרת הבנק רץ על פורט 8081.')
+    throw new ApiError(0, 'לא ניתן להתחבר לשרת. בדוק את החיבור לאינטרנט ונסה שוב בעוד רגע.')
   }
 
   const text = await res.text()
