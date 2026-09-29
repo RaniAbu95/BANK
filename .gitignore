@@ -35,5 +35,6 @@ build/
 ### DB_Store ###
 .DS_Store
 
-### Client cmd ###
-client/cmd
+### Local secrets ###
+.env
+.env.*
