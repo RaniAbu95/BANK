@@ -51,6 +51,23 @@ Tables are created by Hibernate on first start (`ddl-auto=update`).
 
 `client/public/_redirects` sends every path to `index.html` so client-side routes like `/admin` work on refresh.
 
+### Serving the client under a path (e.g. `rani-support.com/bank`)
+
+1. In Pages, add the build variable `BASE_PATH=/bank/` and redeploy. Asset URLs and client routes then live under `/bank/`.
+2. In the site that owns the domain (Vercel), add rewrites to `vercel.json`:
+
+   ```json
+   {
+     "rewrites": [
+       { "source": "/bank", "destination": "https://<project>.pages.dev/" },
+       { "source": "/bank/:path*", "destination": "https://<project>.pages.dev/:path*" }
+     ]
+   }
+   ```
+3. Set `CORS_ALLOWED_ORIGINS` on Render to that site's origin, e.g. `https://rani-support.com`.
+
+With `BASE_PATH` set, the `*.pages.dev` URL itself no longer works directly — only through the rewrite.
+
 ## 4. Keep the server awake — UptimeRobot
 
 Render's free instance sleeps after ~15 min without traffic. A free monitor that calls `/health` every 5 min keeps it awake (one always-on service fits in Render's 750 free hours a month).
