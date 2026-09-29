@@ -1,7 +1,9 @@
 package myBankApplication.controllers;
 
 
+import myBankApplication.BL.CustomerBL;
 import myBankApplication.BL.UserBL;
+import myBankApplication.beans.Account;
 import myBankApplication.beans.AuthRequest;
 import myBankApplication.beans.User;
 import myBankApplication.exceptions.CustomerNotFoundException;
@@ -23,6 +25,8 @@ import org.springframework.security.authentication.AuthenticationManager;
 import myBankApplication.services.CustomUserDetailsService;
 import myBankApplication.util.JwtUtil;
 
+import java.util.Map;
+
 
 
 @RestController
@@ -41,14 +45,19 @@ public class UserController {
     private UserBL userBl;
 
     @Autowired
+    private CustomerBL customerBL;
+
+    @Autowired
     private EmailService emailService;
 
     @PostMapping("/signup")
-    public ResponseEntity<String> createUser(@RequestBody User user) throws Exception {
+    public ResponseEntity<Map<String, Object>> createUser(@RequestBody User user) throws Exception {
         // שולחים קודם את מייל האימות, כדי שכשל בשליחה לא ישאיר משתמש יתום ולא מאומת ב-DB
         emailService.sendVerificationEmail(user.getEmail());
-        userBl.addNewUser(user);
-        return ResponseEntity.ok("User registered successfully");
+        Account account = customerBL.registerUser(user);
+        return ResponseEntity.ok(Map.of(
+                "message", "User registered successfully",
+                "accountNumber", account.getAccountNumber()));
     }
 
     @PostMapping("/login")

@@ -92,6 +92,8 @@ export interface Customer {
 
 export interface Account {
   accountId: number
+  /** מספר חשבון בנק בן 7 ספרות — זה המספר שמוצג ללקוח */
+  accountNumber: number
   balance: number
   category: string
   restriction: number | null
@@ -146,7 +148,7 @@ export const auth = {
   login: (userName: string, password: string) =>
     request<string>('POST', '/login', { body: { userName, password } }),
   signup: (user: { userName: string; password: string; location: string; email: string }) =>
-    request<string>('POST', '/signup', { body: user }),
+    request<{ message: string; accountNumber: number }>('POST', '/signup', { body: user }),
   verify: (email: string, code: string) => request<string>('POST', '/verify', { params: { email, code } }),
 }
 

@@ -12,6 +12,7 @@ type Tab = (typeof TABS)[number]['id']
 
 // ערכי הקטגוריה חייבים להתאים בדיוק לערכים שהשרת בודק ב-AccountBL
 const CATEGORIES = [
+  { value: 'Regular', label: 'רגיל' },
   { value: 'Saving', label: 'חיסכון' },
   { value: 'Buisness', label: 'עסקי' },
   { value: 'Student', label: 'סטודנט' },
@@ -176,7 +177,7 @@ function AccountsTab() {
   const [actionError, setActionError] = useState<string | null>(null)
 
   async function suspend(a: Account) {
-    if (!confirm(`להשהות את חשבון ${a.accountId}?`)) return
+    if (!confirm(`להשהות את חשבון ${a.accountNumber ?? a.accountId}?`)) return
     setActionError(null)
     try {
       await accounts.suspend(a.accountId)
@@ -195,12 +196,13 @@ function AccountsTab() {
           <div className="table-wrap">
             <table>
               <thead>
-                <tr><th>#</th><th>לקוח</th><th>קטגוריה</th><th>יתרה</th><th>מסגרת</th><th>סטטוס</th><th /></tr>
+                <tr><th>#</th><th>מספר חשבון</th><th>לקוח</th><th>קטגוריה</th><th>יתרה</th><th>מסגרת</th><th>סטטוס</th><th /></tr>
               </thead>
               <tbody>
                 {rows.map((a) => (
                   <tr key={a.accountId}>
                     <td>{a.accountId}</td>
+                    <td>{a.accountNumber ?? '—'}</td>
                     <td>{a.customer ? `${a.customer.username} (${a.customer.customerId})` : '—'}</td>
                     <td>{CATEGORIES.find((c) => c.value === a.category)?.label ?? a.category}</td>
                     <td className={`num ${a.balance < 0 ? 'negative' : ''}`}>{formatILS(a.balance)}</td>
@@ -226,7 +228,7 @@ function AccountsTab() {
           onSubmit={async (d) => {
             const acc = await accounts.add(num(d, 'customerId'), str(d, 'category'), str(d, 'password'))
             reload()
-            return `נפתח חשבון מספר ${acc.accountId}`
+            return `נפתח חשבון מספר ${acc.accountNumber}`
           }}
         >
           <Field label="מספר לקוח" name="customerId" type="number" min={1} required />

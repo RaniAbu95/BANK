@@ -22,7 +22,7 @@ public class AccountController {
 
 
     @PostMapping("add")
-    public Account add(@RequestParam int customerId,@RequestParam String  category,@RequestParam String password) throws AccountsAlreadyExistException, AccountBalanceErrorException, AccountPasswordErrorException, CustomerNotFoundException, AccountCategoryErrorException, AccountNotFoundException, AccountNotSavedInDataBaseErrorException, BankerNotSavedInDataBaseErrorException, CustomerEmailUnVerfiyedErrorException//Params passed as query string
+    public Account add(@RequestParam int customerId,@RequestParam String  category,@RequestParam String password) throws AccountsAlreadyExistException, AccountBalanceErrorException, AccountPasswordErrorException, CustomerNotFoundException, AccountCategoryErrorException, AccountNotFoundException, AccountNotSavedInDataBaseErrorException, BankerNotSavedInDataBaseErrorException, CustomerEmailUnVerfiyedErrorException, NoBankerAvailableException//Params passed as query string
     {
         Account account = new Account(category, password);
         account.setCustomer(accountBL.getCustomer(customerId));
@@ -38,17 +38,20 @@ public class AccountController {
     }
 
     @GetMapping("getBalance/{accountId}")
-    public double getBalance(@PathVariable int accountId) throws AccountNotFoundException {
+    public double getBalance(@PathVariable int accountId, Authentication authentication) throws AccountNotFoundException, AccountAccessDeniedException {
+        accountBL.checkAccountOwner(accountId, authentication);
         return  accountBL.getAccountBalance(accountId);
     }
 
     @GetMapping("getAllTransactions/{accountId}")
-    public List<Transaction> getLastTransactions(@PathVariable int accountId) throws AccountNotFoundException {
+    public List<Transaction> getLastTransactions(@PathVariable int accountId, Authentication authentication) throws AccountNotFoundException, AccountAccessDeniedException {
+        accountBL.checkAccountOwner(accountId, authentication);
         return this.accountBL.getAllTransactions(accountId);
     }
 
     @GetMapping("getAllLoans/{accountId}")
-    public List<Loan> getAllLoans(@PathVariable int accountId) throws AccountNotFoundException {
+    public List<Loan> getAllLoans(@PathVariable int accountId, Authentication authentication) throws AccountNotFoundException, AccountAccessDeniedException {
+        accountBL.checkAccountOwner(accountId, authentication);
         return this.accountBL.getAllLoanTransactions(accountId);
     }
 

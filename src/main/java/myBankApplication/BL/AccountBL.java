@@ -5,19 +5,33 @@ import myBankApplication.dao.AccountDAO;
 import myBankApplication.exceptions.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.context.event.EventListener;
+import org.springframework.security.core.Authentication;
 
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 
 import javax.security.auth.login.AccountNotFoundException;
+import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 @Service
 public class AccountBL {
+
+    // מספר חשבון בנק: 7 ספרות בדיוק (לא מתחיל ב-0)
+    private static final int ACCOUNT_NUMBER_MIN = 1_000_000;
+    private static final int ACCOUNT_NUMBER_MAX = 9_999_999;
+    private static final int ACCOUNT_NUMBER_MAX_ATTEMPTS = 100;
+    private static final SecureRandom random = new SecureRandom();
+
+    // החשבון שנפתח אוטומטית למשתמש חדש: חשבון רגיל, יתרה 0 ומסגרת 10,000
+    public static final String DEFAULT_CATEGORY = "Regular";
 
     @Autowired
     private AccountDAO accountDAO ;
@@ -62,17 +76,53 @@ public class AccountBL {
     }
 
 
-    public Account addNewAccount(Account account , int customerId) throws CustomerNotFoundException, AccountsAlreadyExistException, AccountPasswordErrorException, AccountCategoryErrorException, AccountNotSavedInDataBaseErrorException, BankerNotSavedInDataBaseErrorException, CustomerEmailUnVerfiyedErrorException {
+    @Transactional(rollbackFor = Exception.class)
+    public Account addNewAccount(Account account , int customerId) throws CustomerNotFoundException, AccountsAlreadyExistException, AccountPasswordErrorException, AccountCategoryErrorException, AccountNotSavedInDataBaseErrorException, BankerNotSavedInDataBaseErrorException, CustomerEmailUnVerfiyedErrorException, NoBankerAvailableException {
 
         checkAccount(account,customerId);
+        return openAccount(account, customerBL.getCustomer(customerId));
+    }
+
+    // פתיחת חשבון ברירת מחדל ללקוח חדש בזמן ההרשמה (לפני אימות המייל, ולכן בלי checkAccount).
+    // בטרנזקציה: גם מחוץ לבקשת HTTP (בעליית השרת) רשימת החשבונות של הבנקאי נטענת,
+    // ואם השמירה נכשלת — גם הגדלת מונה החשבונות של הבנקאי מתבטלת
+    @Transactional(rollbackFor = Exception.class)
+    public Account openDefaultAccount(Customer customer, String password) throws AccountNotSavedInDataBaseErrorException, BankerNotSavedInDataBaseErrorException, NoBankerAvailableException {
+        return openAccount(new Account(DEFAULT_CATEGORY, password), customer);
+    }
+
+    private Account openAccount(Account account, Customer customer) throws AccountNotSavedInDataBaseErrorException, BankerNotSavedInDataBaseErrorException, NoBankerAvailableException {
         setRestrictionAmount(account);
+        account.setAccountNumber(generateAccountNumber());
         Banker responsibleBanker = bankerBL.getBankerWithMinAccounts();
+        if (responsibleBanker == null) {
+            throw new NoBankerAvailableException();
+        }
         bankerBL.incrementBankerAccountsByOne(responsibleBanker.getBankerId());
         responsibleBanker.getAccounts().add(account);
-        Customer customer = customerBL.getCustomer(customerId);
+        account.setBanker(responsibleBanker);
         account.setCustomer(customer);
         saveAccountInDataBase(account);
         return account;
+    }
+
+    public int generateAccountNumber() throws AccountNotSavedInDataBaseErrorException {
+        for (int attempt = 0; attempt < ACCOUNT_NUMBER_MAX_ATTEMPTS; attempt++) {
+            int candidate = ACCOUNT_NUMBER_MIN + random.nextInt(ACCOUNT_NUMBER_MAX - ACCOUNT_NUMBER_MIN + 1);
+            if (!this.accountDAO.existsByAccountNumber(candidate)) {
+                return candidate;
+            }
+        }
+        throw new AccountNotSavedInDataBaseErrorException();
+    }
+
+    // חשבונות שנפתחו לפני שנוסף מספר החשבון מקבלים מספר בעליית השרת
+    @EventListener(ApplicationReadyEvent.class)
+    public void assignMissingAccountNumbers() throws AccountNotSavedInDataBaseErrorException {
+        for (Account account : this.accountDAO.findByAccountNumberIsNull()) {
+            account.setAccountNumber(generateAccountNumber());
+            saveAccountInDataBase(account);
+        }
     }
 
     public Account getAccount(int id) throws AccountNotFoundException {
@@ -81,6 +131,19 @@ public class AccountBL {
             return account.get();
         }
         throw new AccountNotFoundException();
+    }
+
+    // משתמש רגיל רשאי לגשת רק לחשבונות של הלקוח שלו (מקושר לפי שם משתמש); מנהל — לכל חשבון
+    public void checkAccountOwner(int accountId, Authentication authentication) throws AccountNotFoundException, AccountAccessDeniedException {
+        boolean isAdmin = authentication.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+        if (isAdmin) {
+            return;
+        }
+        Customer owner = getAccount(accountId).getCustomer();
+        if (owner == null || !authentication.getName().equals(owner.getUsername())) {
+            throw new AccountAccessDeniedException();
+        }
     }
 
     public int getAccountId(Account account) throws AccountNotFoundException {
@@ -152,8 +215,12 @@ public class AccountBL {
         if(account.getCategory().equals("Student")){
             account.setRestriction(-10000);
         }
+        if(account.getCategory().equals(DEFAULT_CATEGORY)){
+            account.setRestriction(-10000);
+        }
     }
 
+    @Transactional(rollbackFor = Exception.class)
     public void addNewPayment(String paymentType, String timeStamp , double amount, int accountId, VisaInstallments visaInstallments ,Loan loan) throws TransactionAlreadyExistException, TransactionTargetNotFoundErrorException, LoanAlreadyExistException, TransactionOperationNotFoundErrorException, LoanTypeErrorException, TransactionNotSavedInDatabase, AccountBalanceErrorException, LoanAmountErrorException, TransactionAmountNotFoundErrorException, businessLoanAmounLessThan10k, AccountNotFoundException, TransactionTimestampNotFoundErrorException, VisaInstallmentsNotSavedInDatabase {
 
         if(paymentType.equals("VisaInstallment")) {
@@ -166,11 +233,10 @@ public class AccountBL {
         }
 
         else if(paymentType.equals("LoanInstallment")){
-            Transaction transaction =  transactionBL.createNewTransaction(null, "cashWithdrawal", timeStamp, amount,  accountId, "null");
+            // פעולת המשיכה כבר מורידה את הסכום מהיתרה (ובודקת את המסגרת) — אין לעדכן את היתרה שוב
+            transactionBL.createNewTransaction(null, "cashWithdrawal", timeStamp, amount,  accountId, "null");
             loan.setCompletedPayments(loan.getCompletedPayments() + 1);
             loanBL.saveLoanInDataBase(loan);
-            double accountBalance = loan.getAccount().getBalance();
-            updateAccountBalance(accountId, accountBalance - transaction.getAmount());
         }
 
     }

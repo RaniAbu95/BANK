@@ -3,6 +3,8 @@ package myBankApplication.BL;
 import myBankApplication.beans.*;
 import myBankApplication.dao.LoanDAO;
 import myBankApplication.exceptions.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -14,6 +16,8 @@ import java.util.Optional;
 
 @Service
 public class LoanBL {
+
+    private static final Logger log = LoggerFactory.getLogger(LoanBL.class);
 
     @Autowired
     private LoanDAO loanDAO;
@@ -104,7 +108,13 @@ public class LoanBL {
             if(loan.getNumberOfPayments()-loan.getCompletedPayments()>0){
                 double totalAmountToPay = (1+loan.getIntersetRate()/100.0)*(loan.getAmount()/loan.getNumberOfPayments());
                 int accountId = loan.getAccount().getAccountId();
-                accountBl.addNewPayment("LoanInstallment",currentDateTime.toString(),totalAmountToPay,accountId,null,loan);
+                // תשלום שנכשל (למשל חריגה ממסגרת) לא עוצר את התשלומים של שאר ההלוואות;
+                // התשלום לא נספר ויחויב שוב בחודש הבא
+                try {
+                    accountBl.addNewPayment("LoanInstallment",currentDateTime.toString(),totalAmountToPay,accountId,null,loan);
+                } catch (Exception e) {
+                    log.error("Loan payment failed for loan {} (account {})", loan.getLoanId(), accountId, e);
+                }
             }
         }
     }

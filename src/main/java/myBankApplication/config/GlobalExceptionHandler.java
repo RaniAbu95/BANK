@@ -40,15 +40,18 @@ public class GlobalExceptionHandler {
             Map.entry("CustomerNotSavedInDataBaseErrorException", "שמירת הלקוח נכשלה"),
             Map.entry("CompanyErrorException", "פרטי החברה אינם תקינים"),
             Map.entry("AccountBalanceErrorException", "היתרה בחשבון אינה תקינה"),
+            Map.entry("TransactionExceedsLimitException", "הפעולה נדחתה: היא חורגת ממסגרת העובר ושב של החשבון"),
             Map.entry("AccountCategoryErrorException", "סוג החשבון אינו תקין"),
             Map.entry("AccountPasswordErrorException", "סיסמת החשבון אינה תקינה"),
             Map.entry("AccountsAlreadyExistException", "החשבון כבר קיים"),
             Map.entry("AccountNotSavedInDataBaseErrorException", "שמירת החשבון נכשלה"),
             Map.entry("AccountNotFoundException", "החשבון לא נמצא"),
+            Map.entry("AccountAccessDeniedException", "אין לך הרשאה לחשבון זה"),
             Map.entry("BankerNameErrorException", "שם הבנקאי אינו תקין"),
             Map.entry("BankerEmailErrorException", "כתובת הדוא\"ל של הבנקאי אינה תקינה"),
             Map.entry("BankerNotFoundException", "הבנקאי לא נמצא"),
             Map.entry("BankerNotSavedInDataBaseErrorException", "שמירת הבנקאי נכשלה"),
+            Map.entry("NoBankerAvailableException", "אין בנקאי זמין לשיוך החשבון. יש להוסיף בנקאי במערכת"),
             Map.entry("LoanAmountErrorException", "סכום ההלוואה אינו תקין"),
             Map.entry("LoanTypeErrorException", "סוג ההלוואה אינו תקין"),
             Map.entry("LoanAlreadyExist", "ההלוואה כבר קיימת"),
@@ -115,6 +118,8 @@ public class GlobalExceptionHandler {
         if (name.contains("NotFoundError")) return HttpStatus.BAD_REQUEST;
         if (name.contains("NotFound") || name.contains("IsNotExist")) return HttpStatus.NOT_FOUND;
         if (name.contains("AlreadyExist")) return HttpStatus.CONFLICT;
+        if (name.contains("AccessDenied")) return HttpStatus.FORBIDDEN;
+        if (name.equals("NoBankerAvailableException")) return HttpStatus.SERVICE_UNAVAILABLE;
         return HttpStatus.BAD_REQUEST;
     }
 

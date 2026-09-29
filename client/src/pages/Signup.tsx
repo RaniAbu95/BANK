@@ -13,13 +13,14 @@ export default function Signup() {
           submitLabel="הרשמה"
           onSubmit={async (d) => {
             const email = str(d, 'email')
-            await auth.signup({
+            const { accountNumber } = await auth.signup({
               userName: str(d, 'userName'),
               password: str(d, 'password'),
               location: str(d, 'location'),
               email,
             })
-            navigate(`/verify?email=${encodeURIComponent(email)}`)
+            const account = accountNumber ? `&account=${accountNumber}` : ''
+            navigate(`/verify?email=${encodeURIComponent(email)}${account}`)
           }}
         >
           <Field label="שם משתמש" name="userName" required autoComplete="username" />

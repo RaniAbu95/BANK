@@ -1,7 +1,7 @@
 import { createContext, useContext, useState, type ReactNode } from 'react'
 import { auth as authApi, getToken, setToken } from './api'
 
-interface Session {
+export interface Session {
   userName: string
   isAdmin: boolean
 }
@@ -29,7 +29,12 @@ function decode(token: string | null): Session | null {
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [session, setSession] = useState<Session | null>(() => decode(getToken()))
+  const [session, setSession] = useState<Session | null>(() => {
+    const s = decode(getToken())
+    // טוקן שפג תוקפו נשאר ב-localStorage ונשלח עם כל בקשה (כולל /login) — מנקים אותו
+    if (!s) setToken(null)
+    return s
+  })
 
   async function login(userName: string, password: string) {
     const token = await authApi.login(userName, password)
@@ -39,6 +44,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   function logout() {
     setToken(null)
+    // החשבון האחרון שנבחר (Dashboard) שייך למשתמש הזה — לא להשאיר אותו למשתמש הבא
+    try {
+      localStorage.removeItem('bank.lastAccount')
+    } catch {
+      /* ignore */
+    }
     setSession(null)
   }
 
