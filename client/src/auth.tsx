@@ -8,7 +8,7 @@ export interface Session {
 
 interface AuthContextValue {
   session: Session | null
-  login: (userName: string, password: string) => Promise<void>
+  login: (userName: string, password: string) => Promise<Session | null>
   logout: () => void
 }
 
@@ -39,7 +39,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   async function login(userName: string, password: string) {
     const token = await authApi.login(userName, password)
     setToken(token)
-    setSession(decode(token))
+    const s = decode(token)
+    setSession(s)
+    return s
   }
 
   function logout() {
