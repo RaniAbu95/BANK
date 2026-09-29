@@ -3,6 +3,8 @@ services:
     name: bank-server
     runtime: docker
     plan: free
+    # קרוב למסד ב-Aiven (DigitalOcean, אמסטרדם)
+    region: frankfurt
     dockerfilePath: ./Dockerfile
     envVars:
       - key: DB_URL
