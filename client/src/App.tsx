@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { BrowserRouter, Link, Navigate, NavLink, Outlet, Route, Routes, useNavigate } from 'react-router-dom'
+import { BrowserRouter, Link, Navigate, NavLink, Outlet, Route, Routes, useLocation, useNavigate } from 'react-router-dom'
 import { CATEGORY_LABEL, useAccountSelection, type AccountSelection } from './accountSelection'
 import { wakeServer } from './api'
 import { AuthProvider, useAuth } from './auth'
@@ -8,12 +8,15 @@ import Login from './pages/Login'
 import Signup from './pages/Signup'
 import Verify from './pages/Verify'
 import Dashboard from './pages/Dashboard'
+import Landing from './pages/Landing'
 import Admin from './pages/admin/Admin'
 
 function Layout() {
   const { session, logout } = useAuth()
   const selection = useAccountSelection(session)
-  if (!session) return <Navigate to="/login" replace />
+  const { pathname } = useLocation()
+  // מבקר לא מחובר רואה בכתובת הראשית את דף הנחיתה, ובשאר הדפים מופנה להתחברות
+  if (!session) return pathname === '/' ? <Landing /> : <Navigate to="/login" replace />
   return (
     <div className="app">
       <header className="topbar">
