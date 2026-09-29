@@ -1,0 +1,8 @@
+target
+client
+helpers
+.git
+.github
+.idea
+.vscode
+*.docx
