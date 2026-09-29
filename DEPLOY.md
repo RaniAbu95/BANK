@@ -51,6 +51,15 @@ Tables are created by Hibernate on first start (`ddl-auto=update`).
 
 `client/public/_redirects` sends every path to `index.html` so client-side routes like `/admin` work on refresh.
 
+## 4. Keep the server awake — UptimeRobot
+
+Render's free instance sleeps after ~15 min without traffic. A free monitor that calls `/health` every 5 min keeps it awake (one always-on service fits in Render's 750 free hours a month).
+
+1. Sign up at [uptimerobot.com](https://uptimerobot.com).
+2. **New monitor**: type **HTTP(s)**, URL `https://<your-service>.onrender.com/health`, interval **5 minutes**.
+
+If the server does fall asleep, the client wakes it on page load and shows a "server is waking up" banner while requests take longer than 3 seconds.
+
 ## Local run
 
 Nothing changes: every new setting has a default matching the old values, and in dev the Vite proxy avoids CORS.

@@ -71,6 +71,7 @@ public class SecurityConfig {
                                 .requestMatchers("/login").permitAll() // Allow access to /login without authentication
                                 .requestMatchers("/signup").permitAll()
                                 .requestMatchers("/verify").permitAll()
+                                .requestMatchers("/health").permitAll()
                                 // בלי זה כל שגיאה שמועברת ל-/error נחסמת ומגיעה ללקוח כ-403
                                 .requestMatchers("/error").permitAll()
                                 // Allow both USER and ADMIN roles to access these URLs

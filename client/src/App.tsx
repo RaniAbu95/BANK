@@ -1,7 +1,9 @@
 import { useEffect, useRef, useState } from 'react'
 import { BrowserRouter, Link, Navigate, NavLink, Outlet, Route, Routes, useNavigate } from 'react-router-dom'
 import { CATEGORY_LABEL, useAccountSelection, type AccountSelection } from './accountSelection'
+import { wakeServer } from './api'
 import { AuthProvider, useAuth } from './auth'
+import ServerWakeBanner from './components/ServerWakeBanner'
 import Login from './pages/Login'
 import Signup from './pages/Signup'
 import Verify from './pages/Verify'
@@ -102,8 +104,10 @@ function AdminOnly() {
 }
 
 export default function App() {
+  useEffect(wakeServer, [])
   return (
     <AuthProvider>
+      <ServerWakeBanner />
       <BrowserRouter>
         <Routes>
           <Route path="/login" element={<Login />} />

@@ -30,6 +30,44 @@ export class ApiError extends Error {
   }
 }
 
+// השרת במסלול החינמי של Render נרדם כשאין שימוש, והבקשה הראשונה אחרי זה לוקחת עד דקה.
+// בקשה שמתעכבת יותר מ-SLOW_MS מסמנת שהשרת מתעורר, כדי שהממשק יציג הודעה במקום המתנה שקטה.
+const SLOW_MS = 3000
+let slowRequests = 0
+const wakingListeners = new Set<(waking: boolean) => void>()
+
+function changeSlowRequests(delta: number) {
+  const wasWaking = slowRequests > 0
+  slowRequests += delta
+  if (wasWaking !== slowRequests > 0) wakingListeners.forEach((listener) => listener(slowRequests > 0))
+}
+
+export function onServerWaking(listener: (waking: boolean) => void): () => void {
+  wakingListeners.add(listener)
+  return () => wakingListeners.delete(listener)
+}
+
+async function trackedFetch(url: string, init?: RequestInit): Promise<Response> {
+  let slow = false
+  const timer = setTimeout(() => {
+    slow = true
+    changeSlowRequests(1)
+  }, SLOW_MS)
+  try {
+    return await fetch(url, init)
+  } finally {
+    clearTimeout(timer)
+    if (slow) changeSlowRequests(-1)
+  }
+}
+
+/** מעיר את השרת כבר בטעינת האתר, עוד לפני שהמשתמש מתחבר */
+export function wakeServer() {
+  trackedFetch(`${BASE_URL}/health`).catch(() => {
+    /* השגיאה תופיע בבקשה האמיתית הבאה */
+  })
+}
+
 type Params = Record<string, string | number | undefined>
 
 function messageFor(status: number, body: string): string {
@@ -61,7 +99,7 @@ async function request<T>(method: string, path: string, opts: { params?: Params;
 
   let res: Response
   try {
-    res = await fetch(url, {
+    res = await trackedFetch(url, {
       method,
       headers,
       body: opts.body !== undefined ? JSON.stringify(opts.body) : undefined,

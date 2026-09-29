@@ -6,6 +6,7 @@ services:
     # קרוב למסד ב-Aiven (DigitalOcean, אמסטרדם)
     region: frankfurt
     dockerfilePath: ./Dockerfile
+    healthCheckPath: /health
     envVars:
       - key: DB_URL
         sync: false
