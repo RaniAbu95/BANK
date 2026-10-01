@@ -18,9 +18,9 @@ services:
         generateValue: true
       - key: ADMIN_PASSWORD
         sync: false
-      - key: MAIL_USERNAME
+      - key: RESEND_API_KEY
         sync: false
-      - key: MAIL_PASSWORD
+      - key: RESEND_FROM
         sync: false
       - key: CORS_ALLOWED_ORIGINS
         sync: false
