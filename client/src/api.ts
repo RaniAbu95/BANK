@@ -31,33 +31,39 @@ export class ApiError extends Error {
 }
 
 // השרת במסלול החינמי של Render נרדם כשאין שימוש, והבקשה הראשונה אחרי זה לוקחת עד דקה.
-// בקשה שמתעכבת יותר מ-SLOW_MS מסמנת שהשרת מתעורר, כדי שהממשק יציג הודעה במקום המתנה שקטה.
+// בקשה שמתעכבת יותר מ-SLOW_MS מציגה הודעה במקום המתנה שקטה — הודעת "השרת מתעורר",
+// או הודעה משלה כשידוע מראש למה היא איטית (למשל שליחת מייל).
 const SLOW_MS = 3000
-let slowRequests = 0
-const wakingListeners = new Set<(waking: boolean) => void>()
+export const WAKING_MESSAGE = 'השרת מתעורר אחרי זמן ללא שימוש — זה יכול לקחת עד דקה. אין צורך לרענן את הדף.'
+const slowMessages: string[] = []
+const slowListeners = new Set<(message: string | null) => void>()
 
-function changeSlowRequests(delta: number) {
-  const wasWaking = slowRequests > 0
-  slowRequests += delta
-  if (wasWaking !== slowRequests > 0) wakingListeners.forEach((listener) => listener(slowRequests > 0))
+function notifySlow() {
+  const message = slowMessages.at(-1) ?? null
+  slowListeners.forEach((listener) => listener(message))
 }
 
-export function onServerWaking(listener: (waking: boolean) => void): () => void {
-  wakingListeners.add(listener)
-  return () => wakingListeners.delete(listener)
+/** ההודעה של הבקשה האיטית האחרונה שעדיין פתוחה, או null כשאין כזו */
+export function onSlowRequest(listener: (message: string | null) => void): () => void {
+  slowListeners.add(listener)
+  return () => slowListeners.delete(listener)
 }
 
-async function trackedFetch(url: string, init?: RequestInit): Promise<Response> {
+async function trackedFetch(url: string, init?: RequestInit, slowMessage = WAKING_MESSAGE): Promise<Response> {
   let slow = false
   const timer = setTimeout(() => {
     slow = true
-    changeSlowRequests(1)
+    slowMessages.push(slowMessage)
+    notifySlow()
   }, SLOW_MS)
   try {
     return await fetch(url, init)
   } finally {
     clearTimeout(timer)
-    if (slow) changeSlowRequests(-1)
+    if (slow) {
+      slowMessages.splice(slowMessages.indexOf(slowMessage), 1)
+      notifySlow()
+    }
   }
 }
 
@@ -85,7 +91,7 @@ function messageFor(status: number, body: string): string {
   return `שגיאת שרת (${status})`
 }
 
-async function request<T>(method: string, path: string, opts: { params?: Params; body?: unknown } = {}): Promise<T> {
+async function request<T>(method: string, path: string, opts: { params?: Params; body?: unknown; slowMessage?: string } = {}): Promise<T> {
   const query = new URLSearchParams()
   for (const [k, v] of Object.entries(opts.params ?? {})) {
     if (v !== undefined && v !== '') query.set(k, String(v))
@@ -103,7 +109,7 @@ async function request<T>(method: string, path: string, opts: { params?: Params;
       method,
       headers,
       body: opts.body !== undefined ? JSON.stringify(opts.body) : undefined,
-    })
+    }, opts.slowMessage)
   } catch {
     throw new ApiError(0, 'לא ניתן להתחבר לשרת. בדוק את החיבור לאינטרנט ונסה שוב בעוד רגע.')
   }
@@ -186,7 +192,10 @@ export const auth = {
   login: (userName: string, password: string) =>
     request<string>('POST', '/login', { body: { userName, password } }),
   signup: (user: { userName: string; password: string; location: string; email: string }) =>
-    request<{ message: string; accountNumber: number }>('POST', '/signup', { body: user }),
+    request<{ message: string; accountNumber: number }>('POST', '/signup', {
+      body: user,
+      slowMessage: 'שולחים קוד אימות לדוא"ל שהזנת — אם השרת היה רדום זה יכול לקחת עד דקה. אין צורך לרענן את הדף.',
+    }),
   verify: (email: string, code: string) => request<string>('POST', '/verify', { params: { email, code } }),
 }
 

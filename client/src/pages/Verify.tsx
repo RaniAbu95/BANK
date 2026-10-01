@@ -9,17 +9,13 @@ export default function Verify() {
     <div className="auth-page">
       <div className="auth-box">
         <h1>אימות דוא"ל</h1>
-        {accountNumber && (
-          <p>
-            נפתח עבורך חשבון בנק מספר <strong>{accountNumber}</strong>
-          </p>
-        )}
         <p className="muted">הזן את הקוד שנשלח אליך במייל.</p>
         <ActionForm
           submitLabel="אימות"
           onSubmit={async (d) => {
             await auth.verify(str(d, 'email'), str(d, 'code'))
-            return 'הדוא"ל אומת בהצלחה. אפשר להתחבר.'
+            const account = accountNumber ? ` נפתח עבורך חשבון בנק מספר ${accountNumber}.` : ''
+            return `הדוא"ל אומת בהצלחה.${account} אפשר להתחבר.`
           }}
         >
           <Field label='דוא"ל' name="email" type="email" required defaultValue={params.get('email') ?? ''} />
