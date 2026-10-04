@@ -35,6 +35,9 @@ export default function Login() {
         <p className="muted">
           אין לך משתמש? <Link to="/signup">להרשמה</Link> · <Link to="/verify">אימות דוא"ל</Link>
         </p>
+        <p className="muted small">
+          <Link to="/privacy">מדיניות פרטיות</Link>
+        </p>
       </div>
     </div>
   )

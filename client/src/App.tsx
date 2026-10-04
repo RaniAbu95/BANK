@@ -9,6 +9,7 @@ import Signup from './pages/Signup'
 import Verify from './pages/Verify'
 import Dashboard from './pages/Dashboard'
 import Landing from './pages/Landing'
+import Privacy from './pages/Privacy'
 import Admin from './pages/admin/Admin'
 
 function Layout() {
@@ -116,6 +117,7 @@ export default function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/verify" element={<Verify />} />
+          <Route path="/privacy" element={<Privacy />} />
           <Route element={<Layout />}>
             <Route path="/" element={<Dashboard />} />
             <Route path="/admin" element={<AdminOnly />} />

@@ -33,6 +33,9 @@ export default function Signup() {
         <p className="muted">
           כבר רשום? <Link to="/login">להתחברות</Link>
         </p>
+        <p className="muted small">
+          <Link to="/privacy">מדיניות פרטיות</Link>
+        </p>
       </div>
     </div>
   )

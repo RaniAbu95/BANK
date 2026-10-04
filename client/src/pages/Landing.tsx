@@ -42,6 +42,9 @@ export default function Landing() {
           ))}
         </section>
       </main>
+      <footer className="site-footer">
+        <Link to="/privacy">מדיניות פרטיות</Link>
+      </footer>
     </div>
   )
 }
