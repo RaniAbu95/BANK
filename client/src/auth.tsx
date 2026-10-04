@@ -9,6 +9,7 @@ export interface Session {
 interface AuthContextValue {
   session: Session | null
   login: (userName: string, password: string) => Promise<Session | null>
+  loginWithGoogle: (credential: string) => Promise<Session | null>
   logout: () => void
 }
 
@@ -36,12 +37,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return s
   })
 
-  async function login(userName: string, password: string) {
-    const token = await authApi.login(userName, password)
+  function start(token: string) {
     setToken(token)
     const s = decode(token)
     setSession(s)
     return s
+  }
+
+  async function login(userName: string, password: string) {
+    return start(await authApi.login(userName, password))
+  }
+
+  async function loginWithGoogle(credential: string) {
+    return start(await authApi.loginWithGoogle(credential))
   }
 
   function logout() {
@@ -55,7 +63,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setSession(null)
   }
 
-  return <AuthContext.Provider value={{ session, login, logout }}>{children}</AuthContext.Provider>
+  return <AuthContext.Provider value={{ session, login, loginWithGoogle, logout }}>{children}</AuthContext.Provider>
 }
 
 export function useAuth() {
