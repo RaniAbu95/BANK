@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.security.auth.login.AccountNotFoundException;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 
 @Service
@@ -81,6 +82,21 @@ public class CustomerBL {
         checkCustomer(customer);
         saveCustomerInDataBase(customer);
         return accountBL.openDefaultAccount(customer, user.getPassword());
+    }
+
+    // התחברות ראשונה עם Google: פותחים משתמש, לקוח וחשבון כמו בהרשמה רגילה.
+    // שם המשתמש נגזר מהדוא"ל, והסיסמה אקראית — המשתמש נכנס דרך Google ולא עם סיסמה.
+    // Google כבר אימתה את הדוא"ל, ולכן אין צורך בקוד אימות
+    @Transactional(rollbackFor = Exception.class)
+    public User registerGoogleUser(String email) throws UseerNotSavedInDataBaseErrorException, UserUserNameErrorException, UserPasswordErrorException, CustomerEmailErrorException, CustomerLocationErrorException, CustomerIdErrorException, CustomerIsNotExistException, CustomerNotSavedInDataBaseErrorException, AccountNotSavedInDataBaseErrorException, BankerNotSavedInDataBaseErrorException, NoBankerAvailableException {
+        String userName = userBL.uniqueUserName(email.substring(0, email.indexOf('@')));
+        User user = new User(userName, UUID.randomUUID().toString(), "ROLE_USER", "", email);
+        Account account = registerUser(user);
+        user.setEmailVerify("EmailVerfiyed");
+        userBL.saveUserInDataBase(user);
+        account.getCustomer().setEmailVerify("EmailVerfiyed");
+        saveCustomerInDataBase(account.getCustomer());
+        return user;
     }
 
     // משתמשים שנרשמו לפני שההרשמה פתחה חשבון אוטומטית מקבלים לקוח וחשבון בעליית השרת

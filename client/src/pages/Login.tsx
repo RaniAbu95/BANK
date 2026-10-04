@@ -1,6 +1,7 @@
 import { Link, Navigate, useNavigate } from 'react-router-dom'
 import { ApiError } from '../api'
 import { useAuth } from '../auth'
+import GoogleLoginButton from '../components/GoogleLoginButton'
 import { ActionForm, Field, str } from '../components/ui'
 
 export default function Login() {
@@ -30,6 +31,7 @@ export default function Login() {
           <Field label="שם משתמש" name="userName" required autoComplete="username" />
           <Field label="סיסמה" name="password" type="password" required autoComplete="current-password" />
         </ActionForm>
+        <GoogleLoginButton />
         <p className="muted">
           אין לך משתמש? <Link to="/signup">להרשמה</Link> · <Link to="/verify">אימות דוא"ל</Link>
         </p>

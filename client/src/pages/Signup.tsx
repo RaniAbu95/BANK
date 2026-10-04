@@ -1,5 +1,6 @@
 import { Link, useNavigate } from 'react-router-dom'
 import { auth } from '../api'
+import GoogleLoginButton from '../components/GoogleLoginButton'
 import { ActionForm, Field, str } from '../components/ui'
 
 export default function Signup() {
@@ -28,6 +29,7 @@ export default function Signup() {
           <Field label="כתובת" name="location" required />
           <Field label='דוא"ל' name="email" type="email" required />
         </ActionForm>
+        <GoogleLoginButton />
         <p className="muted">
           כבר רשום? <Link to="/login">להתחברות</Link>
         </p>

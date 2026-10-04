@@ -60,6 +60,19 @@ public class UserBL {
         throw new UserNotFoundException();
     }
 
+    public User getUserByEmail(String email) {
+        return this.userDAO.findFirstByEmail(email);
+    }
+
+    // שם משתמש פנוי שמבוסס על base — base, base1, base2...
+    public String uniqueUserName(String base) {
+        String candidate = base;
+        for (int i = 1; this.userDAO.findByUserName(candidate) != null; i++) {
+            candidate = base + i;
+        }
+        return candidate;
+    }
+
     public List<User> getAllUsers() {
         return this.userDAO.findAll();
     }

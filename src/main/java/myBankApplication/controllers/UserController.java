@@ -5,11 +5,14 @@ import myBankApplication.BL.CustomerBL;
 import myBankApplication.BL.UserBL;
 import myBankApplication.beans.Account;
 import myBankApplication.beans.AuthRequest;
+import myBankApplication.beans.GoogleAuthRequest;
 import myBankApplication.beans.User;
 import myBankApplication.exceptions.CustomerNotFoundException;
 import myBankApplication.exceptions.CustomerNotSavedInDataBaseErrorException;
+import myBankApplication.exceptions.GoogleEmailUnVerifiedException;
 import myBankApplication.exceptions.UseerNotSavedInDataBaseErrorException;
 import myBankApplication.services.EmailService;
+import myBankApplication.services.GoogleTokenVerifier;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -50,6 +53,9 @@ public class UserController {
     @Autowired
     private EmailService emailService;
 
+    @Autowired
+    private GoogleTokenVerifier googleTokenVerifier;
+
     @PostMapping("/signup")
     public ResponseEntity<Map<String, Object>> createUser(@RequestBody User user) throws Exception {
         // שולחים קודם את מייל האימות, כדי שכשל בשליחה לא ישאיר משתמש יתום ולא מאומת ב-DB
@@ -78,6 +84,22 @@ public class UserController {
 
     }
 
+    // התחברות עם Google: הלקוח שולח את טוקן הזהות שקיבל מ-Google ומקבל JWT של הבנק, כמו ב-/login.
+    // משתמש שעוד אין לו חשבון עם הדוא"ל הזה נרשם אוטומטית
+    @PostMapping("/login/google")
+    public String googleLogin(@RequestBody GoogleAuthRequest request) throws Exception {
+        String email = googleTokenVerifier.verifiedEmail(request.credential());
+        User user = userBl.getUserByEmail(email);
+        if (user == null) {
+            user = customerBL.registerGoogleUser(email);
+        } else if (!"EmailVerfiyed".equals(user.getEmailVerify())) {
+            // מי שנרשם עם הדוא"ל הזה בלי לאמת אותו מחזיק בסיסמה של המשתמש —
+            // לא מכניסים את בעל חשבון ה-Google לחשבון שמישהו אחר עלול לשלוט בו
+            throw new GoogleEmailUnVerifiedException();
+        }
+        UserDetails userDetails = customUserDetailsService.loadUserByUsername(user.getUserName());
+        return jwtUtil.generateToken(userDetails);
+    }
 
     @PostMapping("/verify")
     public ResponseEntity<String> verify(@RequestParam String email, @RequestParam String code, @RequestParam(required = false) Integer userId) throws CustomerNotSavedInDataBaseErrorException, CustomerNotFoundException, UseerNotSavedInDataBaseErrorException, UseerNotSavedInDataBaseErrorException, CustomerNotSavedInDataBaseErrorException, CustomerNotFoundException {

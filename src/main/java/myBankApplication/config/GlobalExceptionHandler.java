@@ -75,7 +75,10 @@ public class GlobalExceptionHandler {
             Map.entry("ExpiredDateErrorException", "תוקף הכרטיס אינו תקין"),
             Map.entry("VisaCardAlreadyExistException", "הכרטיס כבר קיים"),
             Map.entry("VisaCardNotFoundException", "הכרטיס לא נמצא"),
-            Map.entry("VisaInstallmentsNotSavedInDatabase", "שמירת התשלומים נכשלה")
+            Map.entry("VisaInstallmentsNotSavedInDatabase", "שמירת התשלומים נכשלה"),
+            Map.entry("GoogleLoginDisabledException", "התחברות עם Google לא מוגדרת בשרת"),
+            Map.entry("GoogleTokenErrorException", "האימות מול Google נכשל. נסו שוב"),
+            Map.entry("GoogleEmailUnVerifiedException", "כבר קיים משתמש עם הדוא\"ל הזה, אבל הדוא\"ל שלו עדיין לא אומת. יש לאמת אותו בדף אימות הדוא\"ל או להתחבר עם שם משתמש וסיסמה")
     );
 
     @ExceptionHandler(AuthenticationException.class)
@@ -120,6 +123,9 @@ public class GlobalExceptionHandler {
         if (name.contains("AlreadyExist")) return HttpStatus.CONFLICT;
         if (name.contains("AccessDenied")) return HttpStatus.FORBIDDEN;
         if (name.equals("NoBankerAvailableException")) return HttpStatus.SERVICE_UNAVAILABLE;
+        if (name.equals("GoogleLoginDisabledException")) return HttpStatus.SERVICE_UNAVAILABLE;
+        if (name.equals("GoogleTokenErrorException")) return HttpStatus.UNAUTHORIZED;
+        if (name.equals("GoogleEmailUnVerifiedException")) return HttpStatus.CONFLICT;
         return HttpStatus.BAD_REQUEST;
     }
 

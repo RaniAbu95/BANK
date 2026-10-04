@@ -69,6 +69,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorizeRequests ->
                         authorizeRequests
                                 .requestMatchers("/login").permitAll() // Allow access to /login without authentication
+                                .requestMatchers("/login/google").permitAll()
                                 .requestMatchers("/signup").permitAll()
                                 .requestMatchers("/verify").permitAll()
                                 .requestMatchers("/health").permitAll()

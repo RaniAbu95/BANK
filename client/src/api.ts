@@ -191,6 +191,8 @@ export interface OperationRequest {
 export const auth = {
   login: (userName: string, password: string) =>
     request<string>('POST', '/login', { body: { userName, password } }),
+  /** credential הוא טוקן הזהות שכפתור Google מחזיר; השרת מחזיר JWT כמו ב-login */
+  loginWithGoogle: (credential: string) => request<string>('POST', '/login/google', { body: { credential } }),
   signup: (user: { userName: string; password: string; location: string; email: string }) =>
     request<{ message: string; accountNumber: number }>('POST', '/signup', {
       body: user,
