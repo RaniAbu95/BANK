@@ -133,6 +133,11 @@ public class AccountBL {
         throw new AccountNotFoundException();
     }
 
+    // לפי מספר החשבון בן 7 הספרות שהלקוח רואה (ולא לפי המזהה הפנימי accountId)
+    public Account getAccountByNumber(int accountNumber) throws AccountNotFoundException {
+        return this.accountDAO.findByAccountNumber(accountNumber).orElseThrow(AccountNotFoundException::new);
+    }
+
     // משתמש רגיל רשאי לגשת רק לחשבונות של הלקוח שלו (מקושר לפי שם משתמש); מנהל — לכל חשבון
     public void checkAccountOwner(int accountId, Authentication authentication) throws AccountNotFoundException, AccountAccessDeniedException {
         boolean isAdmin = authentication.getAuthorities().stream()

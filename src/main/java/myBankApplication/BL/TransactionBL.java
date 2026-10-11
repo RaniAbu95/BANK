@@ -85,7 +85,7 @@ public class TransactionBL {
         if (transaction.getAmount() <= 0) {
             throw new TransactionAmountNotFoundErrorException();
         }
-        if (transaction.getOperation() == "CashTransfare") {
+        if (transaction.getOperation().equals("CashTransfare")) {
             TransformationCheck(transaction);
         }
         saveTransactionInDatebase(transaction);
@@ -94,13 +94,20 @@ public class TransactionBL {
 
     }
 
-    private void TransformationCheck(Transaction transaction) throws TransactionTargetNotFoundErrorException, TransactionNotSavedInDatabase {
+    // היעד הוא מספר החשבון בן 7 הספרות — בודקים אותו לפני שנשמרת רשומה או משתנה יתרה
+    private void TransformationCheck(Transaction transaction) throws TransactionTargetNotFoundErrorException {
         if (transaction.getTarget() == null) {
             throw new TransactionTargetNotFoundErrorException();
         }
-        //checkTransActionTybe(transaction);
-        saveTransactionInDatebase(transaction);
-
+        Account target;
+        try {
+            target = accountBL.getAccountByNumber(transaction.getTarget());
+        } catch (AccountNotFoundException e) {
+            throw new TransactionTargetNotFoundErrorException();
+        }
+        if (target.getAccountId() == transaction.getAccount().getAccountId()) {
+            throw new TransferToSameAccountException();
+        }
     }
 
     private void checkTransActionTybe(Transaction transaction) throws AccountNotFoundException, AccountBalanceErrorException, TransactionNotSavedInDatabase, TransactionAlreadyExistException, TransactionTargetNotFoundErrorException, LoanAlreadyExistException, TransactionOperationNotFoundErrorException, LoanTypeErrorException, LoanAmountErrorException, TransactionAmountNotFoundErrorException, businessLoanAmounLessThan10k, TransactionTimestampNotFoundErrorException {
@@ -185,17 +192,11 @@ public class TransactionBL {
     private void CashTransfare(Transaction transaction) throws TransactionNotSavedInDatabase, TransactionExceedsLimitException {
         cashWithdrawal(transaction);
         try {
-            Integer targetAccountId = transaction.getTarget();
-            double accountBalanceFromDatabase = accountBL.getAccountBalance(targetAccountId);
-            double newBalance = accountBalanceFromDatabase + transaction.getAmount();
-            accountBL.updateAccountBalance(targetAccountId, newBalance);
+            Account target = accountBL.getAccountByNumber(transaction.getTarget());
+            accountBL.updateAccountBalance(target.getAccountId(), target.getBalance() + transaction.getAmount());
         } catch (Exception e) {
             throw new TransactionNotSavedInDatabase();
         }
-
-
-        //public cashWithdrawal()
-
     }
 
     public boolean saveTransactionInDatebase(Transaction transaction) throws TransactionNotSavedInDatabase {
