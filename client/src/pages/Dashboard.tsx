@@ -176,7 +176,7 @@ function OperationForm({ accountId, onDone }: { accountId: number; onDone: () =>
         ))}
       </div>
       <Field label={isForex ? 'סכום במטבע זר' : 'סכום (₪)'} name="amount" type="number" min={1} step={1} required />
-      {isTransfer && <Field label="חשבון יעד" name="target" type="number" min={1} required />}
+      {isTransfer && <Field label="מספר חשבון יעד (7 ספרות)" name="target" type="number" min={1000000} max={9999999} required />}
       {isForex && (
         <label className="field">
           <span>מטבע</span>
